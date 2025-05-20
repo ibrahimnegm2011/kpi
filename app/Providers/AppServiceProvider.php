@@ -11,7 +11,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        if ($this->app->environment(['stage'])) {
+            $this->app->usePublicPath(base_path().'/../public_html/dr-rems');
+        } elseif ($this->app->environment(['production'])) {
+            $this->app->usePublicPath(base_path().'/../public_html');
+        }
     }
 
     /**
