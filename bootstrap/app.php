@@ -11,7 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'can' => \App\Http\Middleware\Authorize::class,
+            'representative' => \App\Http\Middleware\EnsureUserIsRepresentative::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
