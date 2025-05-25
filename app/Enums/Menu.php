@@ -18,11 +18,16 @@ enum Menu: string
     case FORECASTS = 'forecasts';
     case MASTER_TABLE = 'master';
     case USERS = 'users';
+    case AGENTS = 'agents';
 
-    case COMPANY_DASHBOARD = 'company_dashboard';
-    case COMPANY_KPIS = 'company_kpis';
-    case COMPANY_SUBMITTED_KPIS = 'company_submitted_kpis';
-    case COMPANY_OVERDUE_KPIS = 'company_overdue_kpis';
+    case AGENT_DASHBOARD = 'agent_dashboard';
+    case AGENT_KPIS = 'agent_kpis';
+    case AGENT_SUBMITTED_KPIS = 'agent_submitted_kpis';
+    case AGENT_OVERDUE_KPIS = 'agent_overdue_kpis';
+
+    case ADMIN_DASHBOARD = 'admin_dashboard';
+    case ADMIN_ACCOUNTS = 'admin_accounts';
+    case ADMIN_USERS = 'admin_users';
 
     public function icon()
     {
@@ -30,14 +35,16 @@ enum Menu: string
             'DASHBOARD' => '<i class="fa fa-chart-line mr-3"></i>',
             'MASTER_TABLE' => '<i class="fas fa-crosshairs mr-3"></i>',
             'FORECASTS' => '<i class="fas fa-bullseye mr-3"></i>',
-            'KPIS' => '<i class="fas fa-key mr-3"></i>',
+            'KPIS', 'COMPANY_KPIS' => '<i class="fas fa-key mr-3"></i>',
             'KPIS_CATEGORIES' => '<i class="fas fa-list mr-3"></i>',
             'COMPANIES' => '<i class="fas fa-building mr-3"></i>',
             'DEPARTMENTS' => '<i class="fas fa-layer-group mr-3"></i>',
-            'USERS' => '<i class="fas fa-users mr-3"></i>',
+            'USERS', 'ADMIN_USERS' => '<i class="fas fa-users mr-3"></i>',
+            'AGENTS' => '<i class="fas fa-user-tie mr-3"></i>',
+
+            'ADMIN_ACCOUNTS' => '<i class="fas fa-sitemap mr-3"></i>',
 
             'COMPANY_DASHBOARD' => '<i class="fas fa-chart-line mr-3"></i>',
-            'COMPANY_KPIS' => '<i class="fas fa-key mr-3"></i>',
             'COMPANY_SUBMITTED_KPIS' => '<i class="fas fa-check-double mr-3"></i>',
             'COMPANY_OVERDUE_KPIS' => '<i class="fas fa-hourglass-end mr-3"></i>',
             default => ''
@@ -49,9 +56,14 @@ enum Menu: string
         return match ($this->name) {
             'MASTER_TABLE' => 'Performance Report',
             'KPIS' => 'KPI Definitions',
-            'COMPANY_KPIS' => 'KPIs',
-            'COMPANY_SUBMITTED_KPIS' => 'Done KPIs',
-            'COMPANY_OVERDUE_KPIS' => 'Overdue KPIs',
+
+            'ADMIN_DASHBOARD' => 'Dashboard',
+            'ADMIN_ACCOUNTS' => 'Accounts',
+            'ADMIN_USERS' => 'Users',
+
+            'AGENT_KPIS' => 'KPIs',
+            'AGENT_SUBMITTED_KPIS' => 'Done KPIs',
+            'AGENT_OVERDUE_KPIS' => 'Overdue KPIs',
             default => Str::headline($this->value)
         };
     }
@@ -60,12 +72,47 @@ enum Menu: string
     {
         return match ($this->name) {
             'DASHBOARD' => 'home',
-//            'COMPANY_DASHBOARD' => 'company.dashboard',
-            'COMPANY_KPIS' => 'company_kpis',
-            'COMPANY_SUBMITTED_KPIS' => 'submitted_kpis',
-            'COMPANY_OVERDUE_KPIS' => 'overdue_kpis',
+
+//            'AGENT_DASHBOARD' => 'agent.dashboard',
+            'AGENT_KPIS' => 'agent.kpis',
+            'AGENT_SUBMITTED_KPIS' => 'agent.submitted_kpis',
+            'AGENT_OVERDUE_KPIS' => 'agent.overdue_kpis',
+
+            'ADMIN_DASHBOARD' => 'admin.home',
+            'ADMIN_ACCOUNTS' => 'admin.accounts.index',
+            'ADMIN_USERS' => 'admin.users.index',
+
+            'USERS' => 'account.users.index',
+            'AGENTS' => 'account.agents.index',
+            'COMPANIES' => 'account.companies.index',
+            'DEPARTMENTS' => 'account.departments.index',
+            'KPIS_CATEGORIES' => 'account.categories.index',
+            'KPIS' => 'account.kpis.index',
+            'FORECASTS' => 'account.forecasts.index',
+            'MASTER_TABLE' => 'account.master.index',
+
             default => Route::has($this->value.'.index') ? $this->value.'.index' : 'home'
         };
+    }
+
+    public function isActive()
+    {
+        if(in_array($this, $this->adminItems())) {
+            $segments = explode('.', $this->route());
+            return $segments[0] == 'admin' && str_contains(request()->route()->getName(), $segments[1]);
+        }
+
+        if(in_array($this, $this->agentItems())) {
+            $segments = explode('.', $this->route());
+            return $segments[0] == 'agent' && str_contains(request()->route()->getName(), $segments[1]);
+        }
+
+        if(in_array($this, $this->accountItems())) {
+            $segments = explode('.', $this->route());
+            return $segments[0] == 'account' && str_contains(request()->route()->getName(), $segments[1]);
+        }
+
+        return str_starts_with(request()->route()->getName(), explode('.', $this->route())[0]);
     }
 
     public function isGroup()
@@ -80,29 +127,44 @@ enum Menu: string
 
     public static function items()
     {
-        if (Auth::user()->is_representative) {
-            return self::representativesItems();
-        }
+        return match (Auth::user()->type) {
+            UserType::ADMIN => self::adminItems(),
+            UserType::ACCOUNT => self::accountItems(),
+            UserType::AGENT => self::agentItems(),
+            default => [],
+        };
+    }
 
+    public static function agentItems()
+    {
+        return [
+//            Menu::AGENT_DASHBOARD,
+            Menu::AGENT_KPIS,
+            Menu::AGENT_OVERDUE_KPIS,
+            Menu::AGENT_SUBMITTED_KPIS,
+        ];
+    }
+
+    public static function adminItems()
+    {
+        return [
+//            Menu::ADMIN_DASHBOARD,
+            Menu::ADMIN_ACCOUNTS,
+            Menu::ADMIN_USERS,
+        ];
+    }
+    public static function accountItems()
+    {
         return [
             //            Menu::DASHBOARD,
             Menu::MASTER_TABLE,
             Menu::FORECASTS,
             Menu::KPIS,
             Menu::KPIS_CATEGORIES,
+            Menu::AGENTS,
             Menu::COMPANIES,
             Menu::DEPARTMENTS,
             Menu::USERS,
-        ];
-    }
-
-    public static function representativesItems()
-    {
-        return [
-//            Menu::COMPANY_DASHBOARD,
-            Menu::COMPANY_KPIS,
-            Menu::COMPANY_OVERDUE_KPIS,
-            Menu::COMPANY_SUBMITTED_KPIS,
         ];
     }
 }

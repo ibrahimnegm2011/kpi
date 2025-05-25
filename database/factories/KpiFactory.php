@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\MeasureUnit;
+use App\Enums\UserType;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -21,10 +22,10 @@ class KpiFactory extends Factory
     {
         return [
             'title' => fake()->name(),
-            'category_id' => Category::factory()->create(),
+            'category_id' => Category::factory(),
             'description' => fake()->sentence(),
             'measure_unit' => MeasureUnit::NUMBER(),
-            'created_by' => User::where('is_admin', true)->first()?->id ?? User::factory()->create()->id,
+            'created_by' => User::where('type', UserType::ADMIN())->first()?->id ?? User::factory()->create()->id,
         ];
     }
 }

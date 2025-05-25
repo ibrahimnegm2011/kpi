@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'can' => \App\Http\Middleware\Authorize::class,
-            'representative' => \App\Http\Middleware\EnsureUserIsRepresentative::class,
+            'iam' => \App\Http\Middleware\IAM::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

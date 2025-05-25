@@ -2,7 +2,6 @@
 
 namespace App\Enums\Traits;
 
-use http\Exception\InvalidArgumentException;
 use Illuminate\Support\Arr;
 
 trait EnumTrait
@@ -29,6 +28,6 @@ trait EnumTrait
             return $case->value;
         }
 
-        throw new InvalidArgumentException("Invalid method: {$name}");
+        throw new \InvalidArgumentException("Invalid method: {$name}");
     }
 }

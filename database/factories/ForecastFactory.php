@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserType;
 use App\Models\Company;
 use App\Models\Department;
 use App\Models\Forecast;
@@ -24,7 +25,7 @@ class ForecastFactory extends Factory
             'month' => $this->faker->month(),
             'target' => rand(1, 10) * 10,
             'is_submitted' => false,
-            'created_by' => User::where('is_admin', true)->first()?->id ?? User::factory()->create()->id,
+            'created_by' => User::where('type', UserType::ADMIN())->first()?->id ?? User::factory()->create()->id,
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserType;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -20,7 +21,7 @@ class CompanyFactory extends Factory
         return [
             'name' => fake()->name(),
             'description' => fake()->sentence(),
-            'created_by' => User::where('is_admin', true)->first()?->id ?? User::factory()->create()->id,
+            'created_by' => User::where('type', UserType::ADMIN())->first()?->id ?? User::factory()->create()->id,
         ];
     }
 }

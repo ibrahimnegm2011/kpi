@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\MeasureUnit;
+use App\Models\Traits\HasAccount;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Forecast extends Model
 {
-    use HasUlids, HasFactory;
+    use HasUlids, HasFactory, HasAccount;
 
     protected $guarded = [];
 

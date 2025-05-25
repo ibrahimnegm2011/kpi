@@ -1,9 +1,14 @@
 <x-mail::message>
-# You're Invited to Join KPIs Management System
+# You're Invited to Join {{ config('app.name') }}
 
 Hello {{ $user->name }},
 
-You have been invited to register as a representative of **{{ $user->company->name }}** on our system.
+You have been invited to register as an agent for Account **{{ $account->name }}**.
+Below is a list of all your current assignments for this account:
+
+@foreach($user->agent_assignments as $assignment)
+- **Company:** {{ $assignment->company->name }} | **Department:** {{ $assignment->department->name }}
+@endforeach
 
 To get started, click the button below to complete your registration:
 

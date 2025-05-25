@@ -26,28 +26,10 @@
             @php ! $item instanceof Menu && dd($item)@endphp
             @if(!$item->isGroup() && Auth::user()->hasPermission($item->value))
                 <a href="{{route($item->route())}}"
-                   class="flex items-center text-white opacity-75 hover:opacity-100 py-4 pl-6 nav-item {{str_starts_with(request()->route()->getName(), explode('.', $item->route())[0]) ? 'bg-primary-600' : ''}}">
+                   class="flex items-center text-white opacity-75 hover:opacity-100 py-4 pl-6 nav-item {{$item->isActive() ? 'bg-primary-600' : ''}}">
                     {!! $item->icon() !!}
                     {{$item->title()}}
                 </a>
-            @elseif($item->isGroup())
-                <button class="w-full flex justify-between items-center text-white opacity-75 hover:opacity-100 py-4 pl-6 pr-2 nav-item"  aria-controls="dropdown-{{$item->value}}" data-collapse-toggle="dropdown-{{$item->value}}">
-                    <span>{{$item->title()}}</span>
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                    </svg>
-                </button>
-                <ul id="dropdown-{{$item->value}}" class="hidden py-2 space-y-2 ml-4">
-                    @foreach($item->groupItems() as $subItem)
-                        <li>
-                            <a href="{{route($subItem->route())}}"
-                               class="flex items-center text-white opacity-75 hover:opacity-100 py-4 pl-6 nav-item {{str_starts_with(request()->route()->getName(), $subItem->route()) ? 'active-nav-link' : ''}}">
-                                {!! $subItem->icon() !!}
-                                {{$subItem->title()}}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
             @endif
         @endforeach
     </nav>

@@ -4,11 +4,14 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Menu;
+use App\Enums\UserType;
+use App\Models\Traits\HasAccount;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -16,6 +19,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
 /**
+ * @property string $account_id
  * @property-read Collection<UserPermission> $permissions
  * @property-read Company $company
  * @property-read Department $department
@@ -23,7 +27,7 @@ use Illuminate\Support\Facades\Auth;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasUlids, Notifiable;
+    use HasFactory, HasUlids, Notifiable, HasAccount;
 
     /**
      * The attributes that are mass assignable.
@@ -51,11 +55,27 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
-            'is_admin' => 'boolean',
             'is_active' => 'boolean',
-            'is_representative' => 'boolean',
-            'registered_at' => 'datetime',
+            'is_agent' => 'boolean',
+            'onboarded_at' => 'datetime',
+            'type' => UserType::class,
         ];
+    }
+
+    public function account(): belongsTo
+    {
+        return $this->belongsTo(Account::class);
+    }
+
+    public function agent_accounts():BelongsToMany
+    {
+        return $this->belongsToMany(Account::class, 'agent_accounts', 'user_id', 'account_id')
+            ->withPivot('company_id', 'department_id', 'position');
+    }
+
+    public function agent_assignments(): HasMany
+    {
+        return $this->hasMany(AgentAssignment::class);
     }
 
     public function company(): belongsTo
@@ -84,50 +104,18 @@ class User extends Authenticatable
         return $query;
     }
 
-    public function scopeType(Builder $query, string $type)
-    {
-        if ($type == 'admin') {
-            return $query->where('is_admin', true)
-                ->where('is_representative', false);
-        }
-        if ($type == 'representative') {
-            return $query->where('is_representative', true)
-                ->where('is_admin', false);
-        }
-
-        if ($type == 'normal') {
-            return $query->where('is_representative', false)
-                ->where('is_admin', false);
-        }
-
-        return $query;
-    }
-
     public function hasPermission(...$permissions): bool
     {
         foreach ($permissions as $permission) {
-            if(Auth::user()->is_representative && in_array(Menu::tryFrom($permission), Menu::representativesItems())) {
+
+            if(Auth::user()->type == UserType::AGENT && in_array(Menu::tryFrom($permission), Menu::agentItems())) {
                 return true;
             }
         }
 
-        return $this->is_admin || $this->hasNonAdminPermission(...$permissions);
-    }
-
-    public function hasNonAdminPermission(...$permissions): bool
-    {
-        $permissions = Arr::wrap($permissions);
-
         return $this->loadMissing('permissions')
             ->permissions->whereIn('permission', $permissions)
             ->isNotEmpty();
-    }
-
-    public function hasAnyPermission()
-    {
-        $this->loadMissing('permissions');
-
-        return $this->is_admin || $this->permissions->isNotEmpty();
     }
 
     public function addPermissions($permissions)

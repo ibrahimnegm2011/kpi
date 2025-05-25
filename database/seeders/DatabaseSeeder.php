@@ -3,6 +3,9 @@
 namespace Database\Seeders;
 
 use App\Enums\MeasureUnit;
+use App\Enums\Permission;
+use App\Enums\UserType;
+use App\Models\Account;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Department;
@@ -10,6 +13,7 @@ use App\Models\Forecast;
 use App\Models\Kpi;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\UserPermission;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 
@@ -20,33 +24,62 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
+        $user = User::factory()->create([
             'name' => 'Ibrahim Negm',
             'email' => 'negm.ia@sirc.sa',
-            'is_admin' => true,
         ]);
 
-        Company::factory()->create(['name' => 'SIRC']);
-        Company::factory()->create(['name' => 'REVIVA']);
-        Company::factory()->create(['name' => 'AKAM']);
-        Company::factory()->create(['name' => 'SAIL']);
-        Company::factory()->create(['name' => 'AZYAT']);
+        foreach (Permission::adminPermissions() as $permission) {
+            UserPermission::factory()->create([
+                'user_id' => $user->id,
+                'permission' => $permission,
+            ]);
+        }
 
-        Department::factory()->create(['name' => 'IT']);
-        Department::factory()->create(['name' => 'HR']);
-        Department::factory()->create(['name' => 'Procurement']);
-        Department::factory()->create(['name' => 'Business Development']);
-        Department::factory()->create(['name' => 'Finance']);
-        Department::factory()->create(['name' => 'Marketing']);
-        Department::factory()->create(['name' => 'Public Relations']);
+        $account = Account::factory()->create([
+            'name' => 'IT Account',
+            'contact_name' => 'Karim Gamal',
+            'contact_email' => 'gamal.k@sirc.sa',
+            'contact_phone' => '+96657838778',
+        ]);
 
-        $cat1 = Category::factory()->create(['name' => 'Branding']);
-        $cat2 = Category::factory()->create(['name' => 'Recycling Projects']);
-        $cat3 = Category::factory()->create(['name' => 'Revenue']);
+        $accUser = User::factory()->create([
+            'account_id' => $account->id,
+            'name' => 'Karim Gamal',
+            'email' => 'gamal.k@sirc.sa',
+            'type' => UserType::ACCOUNT()
+        ]);
 
-        Kpi::factory()->create(['category_id' => $cat1->id, 'title' => 'Increase Number of Visits of Website']);
-        Kpi::factory()->create(['category_id' => $cat2->id, 'title' => 'Increase Number of Projects']);
-        Kpi::factory()->create(['category_id' => $cat3->id, 'title' => 'Increase Sales of Projects', 'measure_unit' => MeasureUnit::AMOUNT()]);
+        foreach (Permission::accountPermissions() as $permission) {
+            UserPermission::factory()->create([
+                'user_id' => $accUser->id,
+                'permission' => $permission,
+            ]);
+        }
+
+
+        Company::factory()->create(['name' => 'SIRC', 'account_id' => $account->id]);;
+        Company::factory()->create(['name' => 'REVIVA', 'account_id' => $account->id]);
+        Company::factory()->create(['name' => 'AKAM', 'account_id' => $account->id]);
+        Company::factory()->create(['name' => 'SAIL', 'account_id' => $account->id]);
+        Company::factory()->create(['name' => 'AZYAT', 'account_id' => $account->id]);
+
+        Department::factory()->create(['name' => 'IT', 'account_id' => $account->id]);
+        Department::factory()->create(['name' => 'HR', 'account_id' => $account->id]);
+        Department::factory()->create(['name' => 'Procurement', 'account_id' => $account->id]);
+        Department::factory()->create(['name' => 'Business Development', 'account_id' => $account->id]);
+        Department::factory()->create(['name' => 'Finance', 'account_id' => $account->id]);
+        Department::factory()->create(['name' => 'Marketing', 'account_id' => $account->id]);
+        Department::factory()->create(['name' => 'Public Relations', 'account_id' => $account->id]);
+
+        $cat1 = Category::factory()->create(['name' => 'Branding', 'account_id' => $account->id]);
+        $cat2 = Category::factory()->create(['name' => 'Recycling Projects', 'account_id' => $account->id]);
+        $cat3 = Category::factory()->create(['name' => 'Revenue', 'account_id' => $account->id]);
+
+        Kpi::factory()->create(['category_id' => $cat1->id, 'title' => 'Increase Number of Visits of Website', 'account_id' => $account->id]);
+        Kpi::factory()->create(['category_id' => $cat2->id, 'title' => 'Increase Number of Projects', 'account_id' => $account->id]);
+        Kpi::factory()->create(['category_id' => $cat3->id, 'title' => 'Increase Sales of Projects', 'account_id' => $account->id, 'measure_unit' => MeasureUnit::AMOUNT()]);
+
 
         if(app()->environment('local')) {
             $dates = [
@@ -54,21 +87,25 @@ class DatabaseSeeder extends Seeder
                 now()->lastOfMonth(),
                 now()->addMonths(2)
             ];
-            $companies = Company::all();
+            $companies = Company::forAccount($account->id);
             foreach ($companies as $company) {
-                $departments = Department::all();
+                $departments = Department::forAccount($account->id);
                 foreach ($departments as $department) {
 
                     $user = User::factory()->create([
                         'name' => $company->name.' '.$department->name,
                         'email' => $company->name.'_'.$department->name.'@sirc.sa',
+                        'type' => UserType::AGENT(),
+                    ]);
+                    $user->agent_assignments()->create([
+                        'account_id' => $account->id,
                         'company_id' => $company->id,
                         'department_id' => $department->id,
                         'position' => 'Manager',
-                        'is_representative' => true,
+                        'created_by' => $accUser->id,
                     ]);
 
-                    $kpis = Kpi::all();
+                    $kpis = Kpi::forAccount($account->id);
                     foreach ($kpis as $kpi) {
                         $date = Arr::random($dates);
                         $submissionFields = [];
@@ -84,6 +121,7 @@ class DatabaseSeeder extends Seeder
                         }
 
                         Forecast::factory()->create([
+                            'account_id' => $account->id,
                             'kpi_id' => $kpi->id,
                             'company_id' => $company->id,
                             'department_id' => $department->id,
