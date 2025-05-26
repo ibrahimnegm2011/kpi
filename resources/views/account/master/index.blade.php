@@ -2,6 +2,13 @@
     <div class="w-full mt-1">
         <div class="flex justify-between mb-5">
             <h1 class="text-3xl text-black"><i class="fas fa-crosshairs mr-3"></i> Performance Report {{request('filter.year') ?? now()->year}} </h1>
+            <div class="flex gap-3">
+                <a class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded"
+                   href="{{route('account.master.export')}}@if(request()->getQueryString())?{{ request()->getQueryString() }}@endif">
+                    Export
+                </a>
+
+            </div>
         </div>
 
         <div class="bg-white mt-5 p-4">

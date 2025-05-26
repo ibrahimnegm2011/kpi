@@ -95,6 +95,7 @@ Route::name('account.')->namespace('App\Http\Controllers\Account')->group(functi
 
         Route::prefix('master')->name('master.')->controller(MasterTableController::class)->middleware('can:'.Permission::MASTER_TABLE())->group(function () {
             Route::get('/', 'index')->name('index');
+            Route::get('/export', 'export')->name('export');
 
         });
 

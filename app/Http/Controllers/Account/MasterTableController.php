@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Account;
 
+use App\Exports\PerformanceReportExport;
 use App\Http\Controllers\Controller;
 use App\Models\Forecast;
 use Illuminate\Database\Eloquent\Collection;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MasterTableController extends Controller
 {
-    public function index()
+
+    protected function filterForecasts()
     {
         $forecastsQ = Forecast::with(['kpi.category', 'department', 'company'])
             ->where('account_id', auth()->user()->account_id)
@@ -23,13 +26,14 @@ class MasterTableController extends Controller
             $forecastsQ->whereHas('kpi', fn($q) => $q->where('category_id', request('filter.category')));
         }
 
-        $forecasts = $forecastsQ
+        return $forecastsQ
             ->orderBy('month', 'desc')
             ->orderBy('company_id')
             ->get();
+    }
 
-        $filteredMonths = $forecasts->pluck('month')->unique();
-
+    protected function groupingForecasts($forecasts)
+    {
         if(! request('filter.company') || ! request('filter.department')) {
             $forecasts = $forecasts
                 ->groupBy(function ($item) {
@@ -39,10 +43,10 @@ class MasterTableController extends Controller
                 })
                 ->map(function (Collection $companyDepartmentGroup) {
                     if(! request('filter.category')){
-                       return $companyDepartmentGroup->groupBy(fn(Forecast $item) => $item->kpi->category->name)
-                           ->map(function (Collection $categoryGroup) {
-                               return $categoryGroup->groupBy(fn(Forecast $item) => $item->kpi->name);
-                           });
+                        return $companyDepartmentGroup->groupBy(fn(Forecast $item) => $item->kpi->category->name)
+                            ->map(function (Collection $categoryGroup) {
+                                return $categoryGroup->groupBy(fn(Forecast $item) => $item->kpi->name);
+                            });
                     } else {
                         return $companyDepartmentGroup->groupBy(fn(Forecast $item) => $item->kpi->name);
                     }
@@ -59,6 +63,26 @@ class MasterTableController extends Controller
             }
         }
 
+        return $forecasts;
+    }
+
+    public function index()
+    {
+        $forecasts = $this->filterForecasts();
+
+        $filteredMonths = $forecasts->pluck('month')->unique();
+
+        $forecasts = $this->groupingForecasts($forecasts);
+
         return view('account.master.index', compact('forecasts', 'filteredMonths'));
+    }
+
+    public function export()
+    {
+        $forecasts = $this->filterForecasts();
+
+        //export
+        $filename = 'performance-report-' . now()->format('YmdHis') . '.xlsx';
+        return Excel::download(new PerformanceReportExport($forecasts), $filename);
     }
 }
