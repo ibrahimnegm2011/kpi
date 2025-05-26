@@ -68,7 +68,7 @@
                 <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                            for="grid-measure_unit">
-                        Unit of Measurement
+                        Unit of Measurement (UOM)
                     </label>
                     <input
                         class="appearance-none bg-transparent border-b block w-full text-gray-700 py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-gray-50"
@@ -80,7 +80,7 @@
                 <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                            for="grid-symbol">
-                        Symbol
+                        UOM Symbol
                     </label>
                     <input
                         class="appearance-none bg-transparent border-b block w-full text-gray-700 py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-gray-50"

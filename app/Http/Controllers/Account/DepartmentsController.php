@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
+use App\Models\AgentAssignment;
 use App\Models\Department;
+use App\Models\Forecast;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -68,6 +70,13 @@ class DepartmentsController extends Controller
 
     public function delete(Department $department)
     {
+        if(AgentAssignment::where('department_id', $department->id)->count() > 0) {
+            return redirect(route('account.departments.index'))->with(['error' => 'Department has assigned to agents. Please delete them first.']);
+        }
+
+        if(Forecast::where('department_id', $department->id)->count() > 0) {
+            return redirect(route('account.departments.index'))->with(['error' => 'Department has forecasts. Please delete them first.']);
+        }
         $department->delete();
 
         return redirect(route('account.departments.index'))->with(['success' => 'Department has been deleted successfully.']);

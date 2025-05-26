@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Kpi;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,6 +71,9 @@ class CategoriesController extends Controller
     public function delete(Category $category)
     {
         //TODO: check the model is related to the current account or not
+        if(Kpi::where('category_id', $category->id)->count() > 0) {
+            return redirect(route('account.categories.index'))->with(['error' => 'Category has kpis. Please delete them first.']);
+        }
 
         $category->delete();
 
