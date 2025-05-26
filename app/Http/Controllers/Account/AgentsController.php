@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -139,6 +140,8 @@ class AgentsController extends Controller
                 ));
             });
         } catch (\Throwable $th) {
+            Log::error($th->getMessage(), $th->getTrace());
+
             return redirect(route('account.agents.create'))
                 ->withInput()
                 ->with(['error' => app()->environment('local') ? $th->getMessage() : 'Something wrong. Try again or contact administrator.']);
