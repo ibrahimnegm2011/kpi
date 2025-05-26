@@ -20,7 +20,6 @@ class Kpi extends Model
     public function casts()
     {
         return [
-            'measure_unit' => MeasureUnit::class,
             'is_active' => 'boolean',
         ];
     }

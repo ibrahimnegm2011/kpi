@@ -11,8 +11,8 @@
         <div class="bg-white mt-5 p-4">
             <form method="get" id="search-form">
                 <div class="flex items-center justify-items-center gap-3">
-                    <input name="filter[title]" onblur="submitForm()" placeholder="Name"
-                           value="{{request('filter.title')}}"
+                    <input name="filter[name]" onblur="submitForm()" placeholder="Name"
+                           value="{{request('filter.name')}}"
                            class="bg-transparent border-b max-w-xs w-full text-gray-700 py-3 px-4 leading-tight focus:outline-none focus:bg-gray-50">
 
                     <select name="filter[category]" class="max-w-xs w-full" onchange="submitForm()">
@@ -29,17 +29,17 @@
                 <div class="flex gap-3 mt-5">
                     <div class="inline-flex rounded-md shadow-sm" role="group">
                         <button type="button"
-                                class="px-4 py-2 border border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === null || request('filter.active') === '' ? 'bg-secondary-100' : '' }}"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === null || request('filter.active') === '' ? 'bg-secondary-300 text-white' : '' }}"
                                 onclick="setActive('')">
                             All
                         </button>
                         <button type="button"
-                                class="px-4 py-2 border-t border-b border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '1' ? 'bg-secondary-100' : '' }}"
+                                class="px-4 py-2 border-t border-b border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '1' ? 'bg-secondary-300 text-white' : '' }}"
                                 onclick="setActive('1')">
                             Active
                         </button>
                         <button type="button"
-                                class="px-4 py-2 border border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '0' ? 'bg-secondary-100' : '' }}"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '0' ? 'bg-secondary-300 text-white' : '' }}"
                                 onclick="setActive('0')">
                             Inactive
                         </button>
@@ -81,14 +81,14 @@
                 @foreach($kpis as $kpi)
                     <tr class="hover:bg-gray-100">
                         <td class="py-4 px-6 border-b border-grey-light">{{$loop->iteration}}</td>
-                        <td class="py-4 px-6 border-b border-grey-light">{{$kpi->title}}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">{{$kpi->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$kpi->category->name}}</td>
-                        <td class="py-4 px-6 border-b border-grey-light">{{$kpi->measure_unit->title()}}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">{{$kpi->unit_of_measurement}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$kpi->is_active ? 'Active': 'Not Active'}}</td>
                         <td class="py-4 px-6 border-b border-grey-light ">
                             <a class="mx-2 text-secondary-500 hover:text-primary-500" href="{{route('account.kpis.edit', $kpi->id)}}"> <i class="fas fa-edit"></i> </a>
                             <form method="POST" action="{{ route('account.kpis.delete', $kpi) }}" style="display:inline;"
-                                  onsubmit="return confirmDelete('{{ addslashes($kpi->title) }}')">
+                                  onsubmit="return confirmDelete('{{ addslashes($kpi->name) }}')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"

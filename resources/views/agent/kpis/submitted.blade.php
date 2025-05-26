@@ -9,7 +9,7 @@
                 <div class="flex items-center justify-items-center gap-3">
                     <select name="filter[category]" class="max-w-xs w-full" onchange="submitForm()">
                         <option selected value="">All Categories</option>
-                        @foreach(\App\Models\Category::forAccount() as $category)
+                        @foreach(\App\Models\Category::forAccount(session('selected_account')) as $category)
                             <option value="{{$category->id}}" {{request('filter.category') !== $category->id ? '' : 'selected' }}>
                                 {{$category->name}}
                             </option>
@@ -84,7 +84,7 @@
                 @foreach($forecasts as $forecast)
                     <tr class="hover:bg-gray-100">
                         <td class="py-4 px-6 border-b border-grey-light">{{$loop->iteration}}</td>
-                        <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->title}}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->category->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{\Carbon\Carbon::create()->month($forecast->month)->year($forecast->year)->format('F, Y')}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->target}}</td>
@@ -94,7 +94,7 @@
                         </td>
                         <td class="py-4 px-6 border-b border-grey-light">
                             @if($forecast->evidence_filepath)
-                                <a href="{{route('forecasts.download', $forecast)}}" target="_blank">
+                                <a href="{{route('agent.forecasts.download', $forecast)}}" target="_blank">
                                     <i class="fas fa-file-download"></i>
                                 </a>
                             @endif

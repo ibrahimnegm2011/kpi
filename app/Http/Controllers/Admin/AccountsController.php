@@ -84,8 +84,8 @@ class AccountsController extends Controller
             'contact_name' => ['required', 'string'],
             'contact_email' => [
                 'required', 'email',
-                Rule::unique('accounts', 'contact_email')->ignore($account),
-                Rule::unique('users', 'email')->whereNotNull('account_id')->ignore($account->user),
+                Rule::unique('accounts', 'contact_email')->ignoreModel($account),
+                Rule::unique('users', 'email')->whereNotNull('account_id')->ignoreModel($account->user),
             ],
             'contact_phone' => ['required'],
             'is_active' => ['sometimes', 'boolean'],

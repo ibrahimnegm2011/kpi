@@ -138,10 +138,12 @@ return new class extends Migration
         Schema::create('kpis', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->ulid('account_id')->index();
-            $table->string('title');
+            $table->string('name');
             $table->ulid('category_id')->index();
-            $table->text('description')->nullable();
-            $table->string('measure_unit')->nullable();
+            $table->text('definition')->nullable();
+            $table->text('equation')->nullable();
+            $table->string('unit_of_measurement')->nullable();
+            $table->string('symbol')->nullable();
             $table->boolean('is_active')->default(true);
             $table->ulid('created_by')->index();
             $table->timestamps();

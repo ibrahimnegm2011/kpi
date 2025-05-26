@@ -41,10 +41,10 @@ class MasterTableController extends Controller
                     if(! request('filter.category')){
                        return $companyDepartmentGroup->groupBy(fn(Forecast $item) => $item->kpi->category->name)
                            ->map(function (Collection $categoryGroup) {
-                               return $categoryGroup->groupBy(fn(Forecast $item) => $item->kpi->title);
+                               return $categoryGroup->groupBy(fn(Forecast $item) => $item->kpi->name);
                            });
                     } else {
-                        return $companyDepartmentGroup->groupBy(fn(Forecast $item) => $item->kpi->title);
+                        return $companyDepartmentGroup->groupBy(fn(Forecast $item) => $item->kpi->name);
                     }
                 });
         } else {
@@ -52,10 +52,10 @@ class MasterTableController extends Controller
                 $forecasts = $forecasts
                     ->groupBy(fn(Forecast $item) => $item->kpi->category->name)
                     ->map(function (Collection $categoryGroup) {
-                        return $categoryGroup->groupBy(fn(Forecast $item) => $item->kpi->title);
+                        return $categoryGroup->groupBy(fn(Forecast $item) => $item->kpi->name);
                     });
             } else {
-                $forecasts = $forecasts->groupBy(fn(Forecast $item) => $item->kpi->title);
+                $forecasts = $forecasts->groupBy(fn(Forecast $item) => $item->kpi->name);
             }
         }
 

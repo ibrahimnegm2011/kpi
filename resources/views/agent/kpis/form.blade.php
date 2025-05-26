@@ -1,18 +1,19 @@
 <x-app-layout xmlns:x-slot="http://www.w3.org/1999/html">
     <div class="inline-flex items-center">
         <a class="mr-3" href="#" onclick="history.back();"><i class="fas fa-arrow-left"></i> </a>
-        <h1 class=" text-3xl text-black">Submit "{{$forecast->kpi->title}}"</h1>
+        <h1 class=" text-3xl text-black">Submit "{{$forecast->kpi->name}}"</h1>
     </div>
 
     <div class="overflow-auto mt-5">
         @php
             $fields = [
-                'KPI' => $forecast->kpi->title,
-                'Description' => $forecast->kpi->description,
+                'KPI' => $forecast->kpi->name,
                 'Category' => $forecast->kpi->category->name,
                 'Month' => \Carbon\Carbon::create()->month($forecast->month)->year($forecast->year)->format('F, Y'),
-                'Measure Unit' => $forecast->kpi->measure_unit->title(),
-                'Target' => $forecast->target,
+                'Definition' => $forecast->kpi->definition,
+                'Equation' => $forecast->kpi->equation,
+                'Unit of Measurement' => $forecast->kpi->unit_of_measurement,
+                'Target' => "$forecast->target " . ($forecast->kpi->symbol ?? ''),
             ];
             $i = 0;
         @endphp
@@ -29,7 +30,7 @@
 
     <div class="w-full mt-6 rounded overflow-hidden shadow-md bg-white p-10">
         <form class="w-full" enctype="multipart/form-data"
-              action="{{route('kpi_submit', $forecast)}}"
+              action="{{route('agent.kpi_submit', $forecast)}}"
               method="post">
             @csrf
 
@@ -46,21 +47,21 @@
                     @error('value') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                           for="grid-evidence">
-                        Evidence <sub>(zip,doc,pdf)</sub>*
-                    </label>
-                    <input
-                        class="appearance-none bg-transparent block w-full text-gray-700 py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-gray-50"
-                        id="grid-evidence" name="evidence_filepath" type="file"
-                        onchange="if(this.files[0] && this.files[0].size > 10485760){ alert('File must be less than 10 MB'); this.value = ''; }"
-                        accept="image/jpeg,image/png,
-                        application/zip,
-                        application/pdf,
-                        application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-                    @error('evidence_filepath') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
-                </div>
+{{--                <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">--}}
+{{--                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"--}}
+{{--                           for="grid-evidence">--}}
+{{--                        Evidence <sub>(zip,doc,pdf)</sub>*--}}
+{{--                    </label>--}}
+{{--                    <input--}}
+{{--                        class="appearance-none bg-transparent block w-full text-gray-700 py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-gray-50"--}}
+{{--                        id="grid-evidence" name="evidence_filepath" type="file"--}}
+{{--                        onchange="if(this.files[0] && this.files[0].size > 10485760){ alert('File must be less than 10 MB'); this.value = ''; }"--}}
+{{--                        accept="image/jpeg,image/png,--}}
+{{--                        application/zip,--}}
+{{--                        application/pdf,--}}
+{{--                        application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">--}}
+{{--                    @error('evidence_filepath') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror--}}
+{{--                </div>--}}
 
                 <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"

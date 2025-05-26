@@ -1,7 +1,7 @@
 <x-app-layout xmlns:x-slot="http://www.w3.org/1999/html">
     <div class="inline-flex items-center">
         <a class="mr-3" href="{{route('account.kpis.index')}}"><i class="fas fa-arrow-left"></i> </a>
-        <h1 class=" text-3xl text-black">{{$kpi ? 'Update '.($kpi->title) : 'Add New Kpi'}}</h1>
+        <h1 class=" text-3xl text-black">{{$kpi ? 'Update '.($kpi->name) : 'Add New KPI'}}</h1>
     </div>
 
 
@@ -15,14 +15,14 @@
             <div class="flex flex-wrap -mx-3 mb-6">
                 <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                           for="grid-title">
-                        Title*
+                           for="grid-name">
+                        Name*
                     </label>
                     <input
                         class="appearance-none bg-transparent border-b block w-full text-gray-700 py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-gray-50"
-                        id="grid-title" name="title" type="text" placeholder="Title..."
-                        value="{{old('title', $kpi?->title)}}">
-                    @error('title') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
+                        id="grid-name" name="name" type="text" placeholder="Name..."
+                        value="{{old('name', $kpi?->name)}}">
+                    @error('name') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
@@ -40,33 +40,53 @@
                     </select>
                     @error('category_id') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
                 </div>
+                <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                           for="grid-definition">
+                        Definition
+                    </label>
+
+                    <textarea
+                        class="appearance-none bg-transparent border-b block w-full bg-gray-200 text-gray-700  rounded mb-3 py-3 px-4 leading-tight focus:outline-none  focus:bg-gray-50"
+                        id="grid-definition" name="definition"
+                        placeholder="Definition...">{{old('definition', $kpi?->definition)}}</textarea>
+                    @error('definition') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
+                </div>
+                <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                           for="grid-equation">
+                        Equation
+                    </label>
+
+                    <textarea
+                        class="appearance-none bg-transparent border-b block w-full bg-gray-200 text-gray-700  rounded mb-3 py-3 px-4 leading-tight focus:outline-none  focus:bg-gray-50"
+                        id="grid-equation" name="equation"
+                        placeholder="Equation...">{{old('equation', $kpi?->equation)}}</textarea>
+                    @error('equation') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
+                </div>
 
                 <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                            for="grid-measure_unit">
-                        Measure Unit*
+                        Unit of Measurement
                     </label>
-                    <select id="grid-measure_unit" name="measure_unit" class="appearance-none bg-transparent border block w-full text-gray-700 w-3/12 py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-gray-50">
-                        <option {{old('measure_unit', $kpi?->measure_unit) ? '' : 'selected'}} disabled>Select Measure Unit</option>
-                        @foreach(\App\Enums\MeasureUnit::cases() as $unit)
-                            <option value="{{$unit->value}}" {{old('measure_unit', $kpi?->measure_unit->value) == $unit->value ? 'selected' : '' }}>
-                                {{$unit->title()}}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('measure_unit') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
+                    <input
+                        class="appearance-none bg-transparent border-b block w-full text-gray-700 py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-gray-50"
+                        id="grid-measure_unit" name="unit_of_measurement" type="text" placeholder="Unit of Measurement..."
+                        value="{{old('unit_of_measurement', $kpi?->unit_of_measurement)}}">
+                    @error('unit_of_measurement') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
                 </div>
+
                 <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                           for="grid-description">
-                        Description
+                           for="grid-symbol">
+                        Symbol
                     </label>
-
-                    <textarea
-                        class="appearance-none bg-transparent border-b block w-full bg-gray-200 text-gray-700  rounded py-3 px-4 leading-tight focus:outline-none  focus:bg-gray-50"
-                        id="grid-description" name="description"
-                        placeholder="Description...">{{old('description', $kpi?->description)}}</textarea>
-                    @error('description') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
+                    <input
+                        class="appearance-none bg-transparent border-b block w-full text-gray-700 py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-gray-50"
+                        id="grid-symbol" name="symbol" type="text" placeholder="Symbol..."
+                        value="{{old('symbol', $kpi?->symbol)}}">
+                    @error('symbol') <p class="text-red-500 text-xs italic">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="w-full flex justify-center items-center pt-3">

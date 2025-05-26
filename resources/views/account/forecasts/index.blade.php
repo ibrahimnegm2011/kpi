@@ -115,7 +115,7 @@
                 <tbody>
                 @forelse($forecasts as $forecast)
                     <tr class="hover:bg-gray-100">
-                        <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->title}}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{\Carbon\Carbon::create()->month($forecast->month)->year($forecast->year)->format('F, Y')}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->category->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->company->name}} <br/> {{$forecast->department->name}}</td>

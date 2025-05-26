@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Agent;
 
+use App\Http\Controllers\Account\AgentsController;
 use App\Http\Controllers\Controller;
+use App\Models\AgentAssignment;
 use App\Models\Category;
 use App\Models\Forecast;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -13,7 +15,7 @@ use Illuminate\Support\Str;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class KpisController extends Controller
+class KpisController extends AgentController
 {
     public function index()
     {
@@ -23,8 +25,7 @@ class KpisController extends Controller
                 AllowedFilter::exact('year', 'year'),
                 AllowedFilter::exact('month', 'month'),
             ])
-                ->where('company_id', Auth::user()->company_id)
-                ->where('department_id', Auth::user()->department_id)
+                ->forCurrentAgentAssignments()
                 ->where('is_submitted', false)
                 ->paginate(10)->withQueryString(),
         ]);
@@ -38,11 +39,10 @@ class KpisController extends Controller
                 AllowedFilter::exact('year', 'year'),
                 AllowedFilter::exact('month', 'month'),
             ])
-                ->where('company_id', Auth::user()->company_id)
-                ->where('department_id', Auth::user()->department_id)
                 ->where('is_submitted', false)
                 ->where('year', '<=', now()->year)
                 ->where('month', '<', now()->month)
+                ->forCurrentAgentAssignments()
                 ->paginate(10)->withQueryString(),
         ]);
     }
@@ -55,9 +55,8 @@ class KpisController extends Controller
                 AllowedFilter::exact('year', 'year'),
                 AllowedFilter::exact('month', 'month'),
             ])
-                ->where('company_id', Auth::user()->company_id)
-                ->where('department_id', Auth::user()->department_id)
                 ->where('is_submitted', true)
+                ->forCurrentAgentAssignments()
                 ->paginate(10)->withQueryString(),
         ]);
     }
@@ -72,7 +71,7 @@ class KpisController extends Controller
         $data = $request->validate([
             'value' => ['required'],
             'evidence_filepath' => [
-                'required',
+                'nullable',
                 'file',
                 'max:10240', // 10 MB max size
                 'mimes:zip,pdf,doc,docx,jpg,jpeg,png'
@@ -86,7 +85,7 @@ class KpisController extends Controller
             $extension = $file->getClientOriginalExtension();
 
             // Gather relevant info for filename
-            $kpiTitle = $forecast->kpi->title ?? 'kpi';
+            $kpiTitle = $forecast->kpi->name ?? 'kpi';
             $company = $forecast->company->name ?? 'company';
             $department = $forecast->department->name ?? 'department';
 
@@ -109,6 +108,6 @@ class KpisController extends Controller
 
          $forecast->update($data);
 
-         return redirect(redirect(route('company_kpis')))->with('success', 'KPI has been Submitted successfully!');
+         return redirect(route('agent.kpis'))->with('success', 'KPI has been Submitted successfully!');
     }
 }

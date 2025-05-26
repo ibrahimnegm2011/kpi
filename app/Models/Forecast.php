@@ -10,7 +10,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
+/**
+ * @method Builder forCurrentAgentAssignments()
+ */
 class Forecast extends Model
 {
     use HasUlids, HasFactory, HasAccount;
@@ -53,4 +57,29 @@ class Forecast extends Model
             default => $query,
         };
     }
+
+    public function scopeForCurrentAgentAssignments($query)
+    {
+        $userId = Auth::id();
+        $accountId = session('selected_account');
+
+        $pairs = AgentAssignment::query()
+            ->where('user_id', $userId)
+            ->where('account_id', $accountId)
+            ->get(['department_id', 'company_id']);
+
+        if ($pairs->isEmpty()) {
+            return $query->whereRaw('0 = 1');
+        }
+
+        return $query->where(function ($q) use ($pairs) {
+            $pairs->each(function ($pair) use ($q) {
+                $q->orWhere(function ($q2) use ($pair) {
+                    $q2->where('company_id', $pair['company_id'])
+                        ->where('department_id', $pair['department_id']);
+                });
+            });
+        });
+    }
+
 }

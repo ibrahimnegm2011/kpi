@@ -21,10 +21,12 @@ class KpiFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->name(),
+            'name' => fake()->name(),
             'category_id' => Category::factory(),
-            'description' => fake()->sentence(),
-            'measure_unit' => MeasureUnit::NUMBER(),
+            'definition' => fake()->sentence(),
+            'equation' => fake()->sentence(),
+            'unit_of_measurement' => fake()->word(),
+            'symbol' => MeasureUnit::AMOUNT(),
             'created_by' => User::where('type', UserType::ADMIN())->first()?->id ?? User::factory()->create()->id,
         ];
     }

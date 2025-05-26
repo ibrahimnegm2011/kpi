@@ -1,6 +1,11 @@
 <x-guest-layout>
     <p class="text-gray-600 text-lg font-bold mb-3 text-center">Complete your Registration</p>
-    <p class="text-gray-600 text-lg font-bold mb-6 text-center">{{$user->agent_accounts[0]->name}}</p>
+    <p class="text-gray-600 text-lg font-bold mb-6 text-center">
+        {{$accountsList[0]}}
+        @if($accountsList->count() > 1)
+            <sub><strong><i>(+{{$accountsList->count()-1}} more)</i></strong></sub>
+        @endif
+    </p>
 
     <form method="POST" action="{{ route('account.onboarding.store', $user) }}" class="w-full space-y-4">
         @csrf

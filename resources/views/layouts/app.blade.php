@@ -38,7 +38,22 @@
 <div class=" w-full h-screen flex flex-col  overflow-y-hidden">
     <!-- Desktop Header -->
     <header class="w-full items-center bg-white py-2 px-6 hidden sm:flex">
-        <div class="w-1/2"></div>
+        <div class="w-1/2">
+            {{-- For Agent Users Select Account --}}
+            @php $accounts = Auth::user()->agentAccounts(); @endphp
+            @if(Auth::user()->type == \App\Enums\UserType::AGENT && $accounts->count() > 1)
+                <form method="post" id="account-form" action="{{route('agent.account.change')}}">
+                    @csrf
+                    <select name="accountId" class="max-w-xs w-full" onchange="this.form.submit()">
+                        @foreach($accounts as $account)
+                            <option value="{{$account->id}}" {{session('selected_account') !== $account->id ? '' : 'selected' }}>
+                                {{$account->name}}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            @endif
+        </div>
         <div x-data="{ isOpen: false }" class="relative w-1/2 flex justify-end">
             <button @click="isOpen = !isOpen"
                     class="realtive z-10 w-32 h-12 overflow-hidden hover:bg-gray-100 focus:bg-gray-100 focus:outline-none">

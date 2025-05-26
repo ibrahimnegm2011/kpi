@@ -29,13 +29,13 @@ class AgentsController extends Controller
             'users' => QueryBuilder::for(User::class)->allowedFilters([
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('email'),
-                AllowedFilter::exact('company', 'company_id'),
-                AllowedFilter::exact('department', 'department_id'),
+                AllowedFilter::exact('company', 'agent_assignments.company_id'),
+                AllowedFilter::exact('department', 'agent_assignments.department_id'),
                 AllowedFilter::scope('active'),
             ])
                 ->where('type', UserType::AGENT())
-                ->withWhereHas('agent_assignments', fn ($query) => $query->where('account_id', Auth::user()->account_id))
-                ->with('agent_assignments.company', 'agent_assignments.department')
+                ->withWhereHas('account_agent_assignments')
+                ->with('account_agent_assignments.company', 'account_agent_assignments.department')
                 ->paginate(10)->withQueryString(),
         ]);
     }

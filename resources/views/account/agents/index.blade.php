@@ -96,9 +96,9 @@
                         <td class="py-4 px-6 border-b border-grey-light">{{$user->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$user->email}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">
-                            {{$user->agent_assignments?->first()->company?->name}} - {{$user->agent_assignments?->first()->department?->name}}
-                            @if($user->agent_assignments->count() > 1)
-                                <sub><strong><i>(+{{$user->agent_assignments->count()-1}} more)</i></strong></sub>
+                            {{$user->account_agent_assignments?->first()->company?->name}} - {{$user->account_agent_assignments?->first()->department?->name}}
+                            @if($user->account_agent_assignments->count() > 1)
+                                <sub><strong><i>(+{{$user->account_agent_assignments->count()-1}} more)</i></strong></sub>
                             @endif
                         </td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$user->is_active? 'Active': 'Inactive'}}</td>

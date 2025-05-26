@@ -78,6 +78,16 @@ class User extends Authenticatable
         return $this->hasMany(AgentAssignment::class);
     }
 
+    public function account_agent_assignments(): HasMany
+    {
+        $q = $this->hasMany(AgentAssignment::class);
+        if(Auth::user()?->account_id) {
+            $q->where('account_id', Auth::user()->account_id);
+        }
+
+        return $q;
+    }
+
     public function company(): belongsTo
     {
         return $this->belongsTo(Company::class);
@@ -123,5 +133,19 @@ class User extends Authenticatable
         $this->permissions()->delete();
 
         $this->permissions()->createMany(Arr::map($permissions, fn ($value) => ['permission' => $value]));
+    }
+
+    public function agentAccounts()
+    {
+        if($this->type != UserType::AGENT) {
+            return [];
+        }
+
+        return $this->agent_assignments()
+            ->with('account')
+            ->get()
+            ->map(fn ($assignment) => $assignment->account)
+            ->unique()
+            ->values();
     }
 }

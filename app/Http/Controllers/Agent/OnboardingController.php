@@ -24,9 +24,12 @@ class OnboardingController extends Controller
             abort(401);
         }
 
-        $user->loadMissing('agent_accounts');
+        $user->loadMissing('agent_assignments.account');
+        $accountsList = $user->agent_assignments
+            ->map(fn ($assignment) => $assignment->account->name)
+            ->unique()->values();
 
-        return view('agent.onboarding.form', compact('user'));
+        return view('agent.onboarding.form', compact('user', 'accountsList'));
     }
 
     public function onboarding(Request $request, User $user)

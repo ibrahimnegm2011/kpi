@@ -1,7 +1,7 @@
 <x-app-layout xmlns:x-slot="http://www.w3.org/1999/html">
     <div class="inline-flex items-center">
         <a class="mr-3" href="{{route('account.forecasts.index')}}"><i class="fas fa-arrow-left"></i> </a>
-        <h1 class=" text-3xl text-black">{{$forecast ? 'Update "'.($forecast->kpi->title). '" Forecast' : 'Add New Forecast'}}</h1>
+        <h1 class=" text-3xl text-black">{{$forecast ? 'Update "'.($forecast->kpi->name). '" Forecast' : 'Add New Forecast'}}</h1>
     </div>
 
 
@@ -34,14 +34,14 @@
                         KPI*
                     </label>
                     <select id="grid-kpi" name="kpi_id" class="appearance-none bg-transparent border block w-full text-gray-700 w-3/12 py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-gray-50">
-                        <option {{old('kpi_id', $forecast?->kpi_id) ? '' : 'selected'}} disabled>Select Kpi</option>
+                        <option {{old('kpi_id', $forecast?->kpi_id) ? '' : 'selected'}} disabled>Select KPI</option>
                         @php
                             $category = old('category_id', $forecast?->kpi->category_id);
                             $kpis = $category ? \App\Models\Kpi::where('category_id', $category)->get() : collect();
                         @endphp
                         @foreach($kpis as $kpi)
                             <option value="{{$kpi->id}}" {{old('kpi_id', $forecast?->kpi_id) == $kpi->id ? 'selected' : '' }}>
-                                {{$kpi->title}}
+                                {{$kpi->name}}
                             </option>
                         @endforeach
                     </select>
@@ -160,7 +160,7 @@
                             data.forEach(kpi => {
                                 const option = document.createElement('option');
                                 option.value = kpi.id;
-                                option.textContent = kpi.title;
+                                option.textContent = kpi.name;
                                 kpiSelect.appendChild(option);
                             });
                         })

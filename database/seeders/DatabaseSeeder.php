@@ -76,63 +76,74 @@ class DatabaseSeeder extends Seeder
         $cat2 = Category::factory()->create(['name' => 'Recycling Projects', 'account_id' => $account->id]);
         $cat3 = Category::factory()->create(['name' => 'Revenue', 'account_id' => $account->id]);
 
-        Kpi::factory()->create(['category_id' => $cat1->id, 'title' => 'Increase Number of Visits of Website', 'account_id' => $account->id]);
-        Kpi::factory()->create(['category_id' => $cat2->id, 'title' => 'Increase Number of Projects', 'account_id' => $account->id]);
-        Kpi::factory()->create(['category_id' => $cat3->id, 'title' => 'Increase Sales of Projects', 'account_id' => $account->id, 'measure_unit' => MeasureUnit::AMOUNT()]);
+        Kpi::factory()->create([
+            'account_id' => $account->id, 'category_id' => $cat1->id, 'name' => 'Increase Number of Visits of Website',
+            'definition' => 'Increase Number of Visits of Website', 'equation' => 'Increase Number of Visits of Website',
+            'unit_of_measurement' => 'Number of Visits', 'symbol' => 'V'
+        ]);
+        Kpi::factory()->create([
+            'account_id' => $account->id, 'category_id' => $cat2->id, 'name' => 'Increase Number of Projects',
+            'definition' => 'Increase Number of Projects', 'equation' => 'Increase Number of Projects',
+            'unit_of_measurement' => 'Number of Projects', 'symbol' => 'P'
+        ]);
+        Kpi::factory()->create([
+            'account_id' => $account->id, 'category_id' => $cat3->id, 'name' => 'Increase Sales of Projects',
+            'definition' => 'Increase Sales of Projects', 'equation' => 'Increase Sales of Projects',
+            'unit_of_measurement' => 'Amount of Revenue', 'symbol' => 'SAR'
+        ]);
 
-
-        if(app()->environment('local')) {
-            $dates = [
-                now()->subMonth(),
-                now()->lastOfMonth(),
-                now()->addMonths(2)
-            ];
-            $companies = Company::forAccount($account->id);
-            foreach ($companies as $company) {
-                $departments = Department::forAccount($account->id);
-                foreach ($departments as $department) {
-
-                    $user = User::factory()->create([
-                        'name' => $company->name.' '.$department->name,
-                        'email' => $company->name.'_'.$department->name.'@sirc.sa',
-                        'type' => UserType::AGENT(),
-                    ]);
-                    $user->agent_assignments()->create([
-                        'account_id' => $account->id,
-                        'company_id' => $company->id,
-                        'department_id' => $department->id,
-                        'position' => 'Manager',
-                        'created_by' => $accUser->id,
-                    ]);
-
-                    $kpis = Kpi::forAccount($account->id);
-                    foreach ($kpis as $kpi) {
-                        $date = Arr::random($dates);
-                        $submissionFields = [];
-                        if(Arr::random([true, false])){
-                            $submissionFields = [
-                                'is_submitted' => true,
-                                'submitted_at' => now(),
-                                'submitted_by' => $user->id,
-                                'value' => rand(1, 10) * 10,
-                                'remarks' => fake()->sentence(),
-                                'evidence_filepath' => 'evidence/increase-number-of-projects_sirc_hr.pdf',
-                            ];
-                        }
-
-                        Forecast::factory()->create([
-                            'account_id' => $account->id,
-                            'kpi_id' => $kpi->id,
-                            'company_id' => $company->id,
-                            'department_id' => $department->id,
-                            'year' => $date->year,
-                            'month' => $date->month,
-                            'target' => rand(1, 10) * 10,
-                            ...$submissionFields,
-                        ]);
-                    }
-                }
-            }
-        }
+//        if(app()->environment('local')) {
+//            $dates = [
+//                now()->subMonth(),
+//                now()->lastOfMonth(),
+//                now()->addMonths(2)
+//            ];
+//            $companies = Company::forAccount($account->id);
+//            foreach ($companies as $company) {
+//                $departments = Department::forAccount($account->id);
+//                foreach ($departments as $department) {
+//
+//                    $user = User::factory()->create([
+//                        'name' => $company->name.' '.$department->name,
+//                        'email' => $company->name.'_'.$department->name.'@sirc.sa',
+//                        'type' => UserType::AGENT(),
+//                    ]);
+//                    $user->agent_assignments()->create([
+//                        'account_id' => $account->id,
+//                        'company_id' => $company->id,
+//                        'department_id' => $department->id,
+//                        'position' => 'Manager',
+//                        'created_by' => $accUser->id,
+//                    ]);
+//
+//                    $kpis = Kpi::forAccount($account->id);
+//                    foreach ($kpis as $kpi) {
+//                        $date = Arr::random($dates);
+//                        $submissionFields = [];
+//                        if(Arr::random([true, false])){
+//                            $submissionFields = [
+//                                'is_submitted' => true,
+//                                'submitted_at' => now(),
+//                                'submitted_by' => $user->id,
+//                                'value' => rand(1, 10) * 10,
+//                                'remarks' => fake()->sentence(),
+//                                'evidence_filepath' => 'evidence/increase-number-of-projects_sirc_hr.pdf',
+//                            ];
+//                        }
+//
+//                        Forecast::factory()->create([
+//                            'account_id' => $account->id,
+//                            'kpi_id' => $kpi->id,
+//                            'company_id' => $company->id,
+//                            'department_id' => $department->id,
+//                            'year' => $date->year,
+//                            'month' => $date->month,
+//                            'target' => rand(1, 10) * 10,
+//                            ...$submissionFields,
+//                        ]);
+//                    }
+//                }
+//            }
+//        }
     }
 }

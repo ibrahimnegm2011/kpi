@@ -104,7 +104,7 @@ enum Menu: string
 
         if(in_array($this, $this->agentItems())) {
             $segments = explode('.', $this->route());
-            return $segments[0] == 'agent' && str_contains(request()->route()->getName(), $segments[1]);
+            return $segments[0] == 'agent' && request()->route()->getName() === $this->route();
         }
 
         if(in_array($this, $this->accountItems())) {
