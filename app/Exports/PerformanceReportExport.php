@@ -36,7 +36,8 @@ class PerformanceReportExport implements FromCollection, withHeadings
                 'Value' => $forecast->value,
                 'Percentage' => ($forecast->value && $forecast->target != 0)
                     ? round($forecast->value / $forecast->target * 100, 1) . '%'
-                    : '-'
+                    : '-',
+                'Remarks' => $forecast->remarks,
             ];
         });
     }
@@ -48,7 +49,8 @@ class PerformanceReportExport implements FromCollection, withHeadings
             'Definition', 'Equation', 'Unit',
             'Company', 'Department',
             'Year', 'Month',
-            'Target', 'Value', 'Percentage'
+            'Target', 'Value', 'Percentage',
+            'Remarks',
         ];
     }
 }

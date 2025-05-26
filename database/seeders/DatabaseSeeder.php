@@ -38,17 +38,18 @@ class DatabaseSeeder extends Seeder
 
         $account = Account::factory()->create([
             'name' => 'IT Account',
-            'contact_name' => 'Karim Gamal',
-            'contact_email' => 'gamal.k@sirc.sa',
+            'contact_name' => 'Account 1',
+            'contact_email' => 'account1@sirc.sa',
             'contact_phone' => '+96657838778',
         ]);
 
         $accUser = User::factory()->create([
             'account_id' => $account->id,
-            'name' => 'Karim Gamal',
-            'email' => 'gamal.k@sirc.sa',
+            'name' => 'Account 1',
+            'email' => 'account1@sirc.sa',
             'type' => UserType::ACCOUNT()
         ]);
+        $account->update(['admin_user_id' => $accUser->id]);
 
         foreach (Permission::accountPermissions() as $permission) {
             UserPermission::factory()->create([
@@ -92,58 +93,58 @@ class DatabaseSeeder extends Seeder
             'unit_of_measurement' => 'Amount of Revenue', 'symbol' => 'SAR'
         ]);
 
-//        if(app()->environment('local')) {
-//            $dates = [
-//                now()->subMonth(),
-//                now()->lastOfMonth(),
-//                now()->addMonths(2)
-//            ];
-//            $companies = Company::forAccount($account->id);
-//            foreach ($companies as $company) {
-//                $departments = Department::forAccount($account->id);
-//                foreach ($departments as $department) {
-//
-//                    $user = User::factory()->create([
-//                        'name' => $company->name.' '.$department->name,
-//                        'email' => $company->name.'_'.$department->name.'@sirc.sa',
-//                        'type' => UserType::AGENT(),
-//                    ]);
-//                    $user->agent_assignments()->create([
-//                        'account_id' => $account->id,
-//                        'company_id' => $company->id,
-//                        'department_id' => $department->id,
-//                        'position' => 'Manager',
-//                        'created_by' => $accUser->id,
-//                    ]);
-//
-//                    $kpis = Kpi::forAccount($account->id);
-//                    foreach ($kpis as $kpi) {
-//                        $date = Arr::random($dates);
-//                        $submissionFields = [];
-//                        if(Arr::random([true, false])){
-//                            $submissionFields = [
-//                                'is_submitted' => true,
-//                                'submitted_at' => now(),
-//                                'submitted_by' => $user->id,
-//                                'value' => rand(1, 10) * 10,
-//                                'remarks' => fake()->sentence(),
-//                                'evidence_filepath' => 'evidence/increase-number-of-projects_sirc_hr.pdf',
-//                            ];
-//                        }
-//
-//                        Forecast::factory()->create([
-//                            'account_id' => $account->id,
-//                            'kpi_id' => $kpi->id,
-//                            'company_id' => $company->id,
-//                            'department_id' => $department->id,
-//                            'year' => $date->year,
-//                            'month' => $date->month,
-//                            'target' => rand(1, 10) * 10,
-//                            ...$submissionFields,
-//                        ]);
-//                    }
-//                }
-//            }
-//        }
+        if(app()->environment('local')) {
+            $dates = [
+                now()->subMonth(),
+                now()->lastOfMonth(),
+                now()->addMonths(2)
+            ];
+            $companies = Company::forAccount($account->id);
+            foreach ($companies as $company) {
+                $departments = Department::forAccount($account->id);
+                foreach ($departments as $department) {
+
+                    $user = User::factory()->create([
+                        'name' => $company->name.' '.$department->name,
+                        'email' => strtolower($company->name.'_'.$department->name).'@sirc.sa',
+                        'type' => UserType::AGENT(),
+                    ]);
+                    $user->agent_assignments()->create([
+                        'account_id' => $account->id,
+                        'company_id' => $company->id,
+                        'department_id' => $department->id,
+                        'position' => 'Manager',
+                        'created_by' => $accUser->id,
+                    ]);
+
+                    $kpis = Kpi::forAccount($account->id);
+                    foreach ($kpis as $kpi) {
+                        $date = Arr::random($dates);
+                        $submissionFields = [];
+                        if(Arr::random([true, false])){
+                            $submissionFields = [
+                                'is_submitted' => true,
+                                'submitted_at' => now(),
+                                'submitted_by' => $user->id,
+                                'value' => rand(1, 10) * 10,
+                                'remarks' => fake()->sentence(),
+                                'evidence_filepath' => 'evidence/increase-number-of-projects_sirc_hr.pdf',
+                            ];
+                        }
+
+                        Forecast::factory()->create([
+                            'account_id' => $account->id,
+                            'kpi_id' => $kpi->id,
+                            'company_id' => $company->id,
+                            'department_id' => $department->id,
+                            'year' => $date->year,
+                            'month' => $date->month,
+                            'target' => rand(1, 10) * 10,
+                            ...$submissionFields,
+                        ]);
+                    }
+                }
+            }
+        }
     }
 }
