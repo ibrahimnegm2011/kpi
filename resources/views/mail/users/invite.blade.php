@@ -32,6 +32,6 @@ To activate your account and set your password, please click the button below:
 
 If you did not expect this invitation, you can safely ignore this email.
 
-Best regards,
+Thank you,<br>
 {{ config('app.name') }}
 </x-mail::message>
