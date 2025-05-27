@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Auth;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasUlids, Notifiable, HasAccount;
+    use HasAccount, HasFactory, HasUlids, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -67,7 +67,7 @@ class User extends Authenticatable
         return $this->belongsTo(Account::class);
     }
 
-    public function agent_accounts():BelongsToMany
+    public function agent_accounts(): BelongsToMany
     {
         return $this->belongsToMany(Account::class, 'agent_accounts', 'user_id', 'account_id')
             ->withPivot('company_id', 'department_id', 'position');
@@ -81,7 +81,7 @@ class User extends Authenticatable
     public function account_agent_assignments(): HasMany
     {
         $q = $this->hasMany(AgentAssignment::class);
-        if(Auth::user()?->account_id) {
+        if (Auth::user()?->account_id) {
             $q->where('account_id', Auth::user()->account_id);
         }
 
@@ -118,7 +118,7 @@ class User extends Authenticatable
     {
         foreach ($permissions as $permission) {
 
-            if(Auth::user()->type == UserType::AGENT && in_array(Menu::tryFrom($permission), Menu::agentItems())) {
+            if (Auth::user()->type == UserType::AGENT && in_array(Menu::tryFrom($permission), Menu::agentItems())) {
                 return true;
             }
         }
@@ -137,7 +137,7 @@ class User extends Authenticatable
 
     public function agentAccounts()
     {
-        if($this->type != UserType::AGENT) {
+        if ($this->type != UserType::AGENT) {
             return [];
         }
 

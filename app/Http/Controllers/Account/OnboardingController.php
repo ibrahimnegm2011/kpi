@@ -6,19 +6,12 @@ use App\Enums\Permission;
 use App\Enums\UserType;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\UserPermission;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
 
 class OnboardingController extends Controller
 {
-
     public function form(Request $request, ?User $user = null)
     {
         if (! $request->hasValidSignature() || $user->type != UserType::ACCOUNT || $user->onboarded_at) {
@@ -42,7 +35,7 @@ class OnboardingController extends Controller
         $user->update($data);
 
         $permissions = Permission::accountPermissions();
-        if (!empty($permissions)) {
+        if (! empty($permissions)) {
             $permissionsData = collect($permissions)->map(fn (Permission $permissionCase) => [
                 'permission' => $permissionCase->value,
             ])->all();

@@ -60,7 +60,6 @@ return new class extends Migration
         /**
          * migration tables
          */
-
         Schema::create('accounts', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('name')->unique();
@@ -172,7 +171,5 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
-    {
-    }
+    public function down(): void {}
 };

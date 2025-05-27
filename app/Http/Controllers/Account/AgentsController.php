@@ -17,8 +17,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
-use Illuminate\Validation\ValidationException;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -48,12 +46,12 @@ class AgentsController extends Controller
         }
 
         $assignments = [];
-        if(old('assignments')) {
-            $assignments = old('assignments', '[]'); //json string
+        if (old('assignments')) {
+            $assignments = old('assignments', '[]'); // json string
             $assignments = json_decode($assignments, true);
             $companies = Company::whereIn('id', Arr::pluck($assignments, 'company_id'))->pluck('name', 'id');
             $departments = Department::whereIn('id', Arr::pluck($assignments, 'department_id'))->pluck('name', 'id');
-            $assignments = Arr::map($assignments, fn ($assignment) =>[
+            $assignments = Arr::map($assignments, fn ($assignment) => [
                 'companyId' => $assignment['company_id'],
                 'companyName' => $companies[$assignment['company_id']] ?? '',
                 'departmentId' => $assignment['department_id'],
@@ -83,16 +81,16 @@ class AgentsController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'        => ['required', 'string'],
-            'email'       => ['required', 'email'],
+            'name' => ['required', 'string'],
+            'email' => ['required', 'email'],
             'assignments' => ['required', 'string'], // It will be a JSON string
-            'position'    => ['nullable', 'string'],
-            'is_active'   => ['sometimes', 'boolean'],
+            'position' => ['nullable', 'string'],
+            'is_active' => ['sometimes', 'boolean'],
         ]);
 
-        if(User::where('email', $data['email'])
-            ->whereHas('agent_assignments', fn($q) => $q-> where('id', Auth::user()->account_id))
-            ->exists()){
+        if (User::where('email', $data['email'])
+            ->whereHas('agent_assignments', fn ($q) => $q->where('id', Auth::user()->account_id))
+            ->exists()) {
             return back()->withErrors(['email' => 'Email already exists.'])->withInput();
         }
 
@@ -100,14 +98,14 @@ class AgentsController extends Controller
         $assignments = json_decode($request->input('assignments'), true);
 
         // Ensure it's a non-empty array
-        if (!is_array($assignments) || empty($assignments)) {
+        if (! is_array($assignments) || empty($assignments)) {
             return back()->withErrors(['assignments' => 'You must assign at least one company and department.'])->withInput();
         }
 
         // Now validate each company_id and department_id in the array
         foreach ($assignments as $assignment) {
             validator($assignment, [
-                'company_id'    => ['required', Rule::exists('companies', 'id')],
+                'company_id' => ['required', Rule::exists('companies', 'id')],
                 'department_id' => ['required', Rule::exists('departments', 'id')],
             ])->validate();
         }
@@ -155,21 +153,21 @@ class AgentsController extends Controller
     {
         $data = $request->validate([
             'assignments' => ['required', 'string'], // It will be a JSON string
-            'is_active'   => ['sometimes', 'boolean'],
+            'is_active' => ['sometimes', 'boolean'],
         ]);
 
         // Decode the "assignments" JSON string
         $assignments = json_decode($request->input('assignments'), true);
 
         // Ensure it's a non-empty array
-        if (!is_array($assignments) || empty($assignments)) {
+        if (! is_array($assignments) || empty($assignments)) {
             return back()->withErrors(['assignments' => 'You must assign at least one company and department.'])->withInput();
         }
 
         // Now validate each company_id and department_id in the array
         foreach ($assignments as $assignment) {
             validator($assignment, [
-                'company_id'    => ['required', Rule::exists('companies', 'id')],
+                'company_id' => ['required', Rule::exists('companies', 'id')],
                 'department_id' => ['required', Rule::exists('departments', 'id')],
             ])->validate();
         }
@@ -190,7 +188,6 @@ class AgentsController extends Controller
         return redirect(route('account.agents.index'))->with(['success' => 'User has been deleted successfully.']);
     }
 
-
     private function updateAgentAssignments(User $user, array $assignments)
     {
         $arrayToString = fn ($arr) => json_encode(ksort($arr) ? $arr : $arr);
@@ -210,13 +207,13 @@ class AgentsController extends Controller
 
         $isChanged = $toAdd->isNotEmpty() || $toRemove->isNotEmpty();
 
-        if(!$isChanged) {
+        if (! $isChanged) {
             return false;
         }
 
         // Add new assignments
         $user->agent_assignments()->createMany([
-            ... $toAdd->map(fn ($assignment) => [
+            ...$toAdd->map(fn ($assignment) => [
                 'company_id' => $assignment['company_id'],
                 'department_id' => $assignment['department_id'],
                 'account_id' => Auth::user()->account_id,

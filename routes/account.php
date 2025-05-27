@@ -22,7 +22,7 @@ Route::name('account.')->namespace('App\Http\Controllers\Account')->group(functi
             return view('dashboard');
         })->name('home');
 
-        Route::prefix('users')->name('users.')->controller(UsersController::class)->middleware('can:'. Permission::USERS())->group(function () {
+        Route::prefix('users')->name('users.')->controller(UsersController::class)->middleware('can:'.Permission::USERS())->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'form')->name('create');
             Route::post('/store', 'store')->name('store');
@@ -49,7 +49,7 @@ Route::name('account.')->namespace('App\Http\Controllers\Account')->group(functi
             Route::delete('/{department}', 'delete')->name('delete');
         });
 
-        Route::prefix('agents')->name('agents.')->controller(AgentsController::class)->middleware('can:'. Permission::USERS())->group(function () {
+        Route::prefix('agents')->name('agents.')->controller(AgentsController::class)->middleware('can:'.Permission::USERS())->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'form')->name('create');
             Route::post('/store', 'store')->name('store');
@@ -80,7 +80,6 @@ Route::name('account.')->namespace('App\Http\Controllers\Account')->group(functi
             Route::get('/byCategory/{category}', 'byCategory')->name('by_category');
         });
 
-
         Route::prefix('forecasts')->name('forecasts.')->controller(ForecastsController::class)->middleware('can:'.Permission::FORECASTS())->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/view/{forecast}', 'show')->name('view');
@@ -91,7 +90,6 @@ Route::name('account.')->namespace('App\Http\Controllers\Account')->group(functi
             Route::delete('/{forecast}', 'delete')->name('delete');
         });
         Route::get('/forecasts/{forecast}/download', [ForecastsController::class, 'downloadEvidence'])->name('forecasts.download');
-
 
         Route::prefix('master')->name('master.')->controller(MasterTableController::class)->middleware('can:'.Permission::MASTER_TABLE())->group(function () {
             Route::get('/', 'index')->name('index');

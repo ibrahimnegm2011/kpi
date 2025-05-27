@@ -28,5 +28,4 @@ class AgentAssignment extends Pivot
     {
         return $this->belongsTo(Department::class, 'department_id');
     }
-
 }

@@ -6,14 +6,11 @@ use App\Enums\UserType;
 use App\Http\Controllers\Controller;
 use App\Mail\InviteAccountAdmin;
 use App\Models\Account;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -102,7 +99,7 @@ class AccountsController extends Controller
     {
         foreach (['companies', 'departments'] as $relation) {
             if ($account->$relation()->count() > 0) {
-                abort(403, 'Account has ' . $relation . '. Please delete them first.');
+                abort(403, 'Account has '.$relation.'. Please delete them first.');
             }
         }
 

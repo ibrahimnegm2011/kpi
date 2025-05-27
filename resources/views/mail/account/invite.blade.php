@@ -1,18 +1,18 @@
 <x-mail::message>
-# You're Invited to Join KPIs Management System
+# Your {{ config('app.name') }} Account Is Ready
 
 Hello {{ $user->name }},
 
-You have been invited to register as an account admin on our system.
+An account has been created for you on the {{ config('app.name') }} as an account administrator.
 
-To get started, click the button below to complete your registration:
+To activate your account and set your password, please click the button below:
 
 <x-mail::button :url="$url">
-    Register Now
+    Set Your Password
 </x-mail::button>
 
-If you did not expect this invitation, you can safely ignore this email.
+If you did not request this account or believe this message is a mistake, you can safely ignore this email.
 
-Thanks,<br>
+Thank you,<br>
 {{ config('app.name') }}
 </x-mail::message>

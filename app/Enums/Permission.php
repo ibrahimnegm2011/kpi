@@ -37,7 +37,7 @@ enum Permission: string
 
     public function title()
     {
-        return match ($this){
+        return match ($this) {
             self::ADMIN_ACCOUNTS => 'Accounts',
             self::ADMIN_USERS => 'Users',
 
@@ -46,6 +46,7 @@ enum Permission: string
             default => Str::headline($this->value)
         };
     }
+
     public static function adminPermissions()
     {
         return [
@@ -57,7 +58,7 @@ enum Permission: string
     public static function accountPermissions()
     {
         return [
-//            self::DASHBOARD,
+            //            self::DASHBOARD,
             self::MASTER_TABLE,
             self::FORECASTS,
             self::KPIS,

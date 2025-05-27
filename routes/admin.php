@@ -12,7 +12,7 @@ Route::middleware(['auth', 'iam:admin'])
             return view('dashboard');
         })->name('home');
 
-        Route::prefix('users')->name('users.')->controller(AdminUsersController::class)->middleware('can:'. Permission::ADMIN_USERS())->group(function () {
+        Route::prefix('users')->name('users.')->controller(AdminUsersController::class)->middleware('can:'.Permission::ADMIN_USERS())->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'form')->name('create');
             Route::post('/store', 'store')->name('store');

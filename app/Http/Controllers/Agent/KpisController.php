@@ -2,12 +2,7 @@
 
 namespace App\Http\Controllers\Agent;
 
-use App\Http\Controllers\Account\AgentsController;
-use App\Http\Controllers\Controller;
-use App\Models\AgentAssignment;
-use App\Models\Category;
 use App\Models\Forecast;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -74,7 +69,7 @@ class KpisController extends AgentController
                 'nullable',
                 'file',
                 'max:10240', // 10 MB max size
-                'mimes:zip,pdf,doc,docx,jpg,jpeg,png'
+                'mimes:zip,pdf,doc,docx,jpg,jpeg,png',
             ],
             'remarks' => ['nullable', 'string'],
         ]);
@@ -106,8 +101,8 @@ class KpisController extends AgentController
         $data['submitted_by'] = Auth::id();
         $data['submitted_at'] = now();
 
-         $forecast->update($data);
+        $forecast->update($data);
 
-         return redirect(route('agent.kpis'))->with('success', 'KPI has been Submitted successfully!');
+        return redirect(route('agent.kpis'))->with('success', 'KPI has been Submitted successfully!');
     }
 }

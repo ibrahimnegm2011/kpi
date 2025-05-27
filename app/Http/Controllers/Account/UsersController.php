@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -33,9 +31,9 @@ class UsersController extends Controller
 
     public function form(?User $user = null)
     {
-        if($user) {
+        if ($user) {
 
-            if($user->type != UserType::ACCOUNT || $user->account_id != Auth::user()->account_id){
+            if ($user->type != UserType::ACCOUNT || $user->account_id != Auth::user()->account_id) {
                 throw new ModelNotFoundException;
             }
 
@@ -72,7 +70,7 @@ class UsersController extends Controller
 
     public function update(User $user, Request $request)
     {
-        if($user->type != UserType::ACCOUNT || $user->account_id != Auth::user()->account_id){
+        if ($user->type != UserType::ACCOUNT || $user->account_id != Auth::user()->account_id) {
             throw new ModelNotFoundException;
         }
 
@@ -101,7 +99,7 @@ class UsersController extends Controller
             return redirect(route('account.users.index'))->with(['error' => 'You can not delete yourself.']);
         }
 
-        if($user->type != UserType::ACCOUNT || $user->account_id != Auth::user()->account_id){
+        if ($user->type != UserType::ACCOUNT || $user->account_id != Auth::user()->account_id) {
             throw new ModelNotFoundException;
         }
 

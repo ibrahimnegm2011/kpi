@@ -13,7 +13,7 @@ require __DIR__.'/admin.php';
 Route::middleware('auth')->group(function () {
 
     Route::get('/', function () {
-        if(Auth::user()->type  == UserType::ADMIN) {
+        if (Auth::user()->type == UserType::ADMIN) {
             return redirect(route('admin.home'));
         } elseif (Auth::user()->type == UserType::ACCOUNT) {
             return view('dashboard');

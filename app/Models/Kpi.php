@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\MeasureUnit;
 use App\Models\Traits\HasAccount;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -13,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Kpi extends Model
 {
-    use HasFactory, HasUlids, HasAccount;
+    use HasAccount, HasFactory, HasUlids;
 
     protected $guarded = [];
 
@@ -28,7 +27,6 @@ class Kpi extends Model
     {
         return $this->belongsTo(Category::class);
     }
-
 
     public function forecasts(): HasMany
     {

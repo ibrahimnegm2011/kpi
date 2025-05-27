@@ -11,14 +11,13 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 class PerformanceReportExport implements FromCollection, withHeadings
 {
     /**
-     * @param Collection<Forecast> $data
+     * @param  Collection<Forecast>  $data
      */
-    public function __construct(public Collection $data)
-    {}
+    public function __construct(public Collection $data) {}
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         return $this->data->map(function (Forecast $forecast) {
@@ -35,7 +34,7 @@ class PerformanceReportExport implements FromCollection, withHeadings
                 'Target' => $forecast->target,
                 'Value' => $forecast->value,
                 'Percentage' => ($forecast->value && $forecast->target != 0)
-                    ? round($forecast->value / $forecast->target * 100, 1) . '%'
+                    ? round($forecast->value / $forecast->target * 100, 1).'%'
                     : '-',
                 'Remarks' => $forecast->remarks,
             ];

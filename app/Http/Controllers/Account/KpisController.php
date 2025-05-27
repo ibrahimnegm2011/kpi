@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Account;
 
-use App\Enums\MeasureUnit;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Kpi;
@@ -78,10 +77,9 @@ class KpisController extends Controller
         return redirect(route('account.kpis.index'))->with(['success' => 'Kpi has been updated successfully']);
     }
 
-
     public function delete(Kpi $kpi)
     {
-        if($kpi->forecasts()->count() > 0) {
+        if ($kpi->forecasts()->count() > 0) {
             abort(403, 'Kpi has forecasts. Please delete them first.');
         }
 

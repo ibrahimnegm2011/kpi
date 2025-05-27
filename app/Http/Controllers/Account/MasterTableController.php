@@ -10,20 +10,19 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class MasterTableController extends Controller
 {
-
     protected function filterForecasts()
     {
         $forecastsQ = Forecast::with(['kpi.category', 'department', 'company'])
             ->where('account_id', auth()->user()->account_id)
             ->where('year', request('filter.year') ?? now()->year);
-        if(request('filter.company')) {
+        if (request('filter.company')) {
             $forecastsQ->where('company_id', request('filter.company'));
         }
-        if(request('filter.department')) {
+        if (request('filter.department')) {
             $forecastsQ->where('department_id', request('filter.department'));
         }
-        if(request('filter.category')) {
-            $forecastsQ->whereHas('kpi', fn($q) => $q->where('category_id', request('filter.category')));
+        if (request('filter.category')) {
+            $forecastsQ->whereHas('kpi', fn ($q) => $q->where('category_id', request('filter.category')));
         }
 
         return $forecastsQ
@@ -34,32 +33,37 @@ class MasterTableController extends Controller
 
     protected function groupingForecasts($forecasts)
     {
-        if(! request('filter.company') || ! request('filter.department')) {
+        if (! request('filter.company') || ! request('filter.department')) {
             $forecasts = $forecasts
                 ->groupBy(function ($item) {
-                    if(request('filter.company')) return $item->department->name;
-                    if(request('filter.department')) return $item->company->name;
-                    return $item->company->name . ' (' . $item->department->name .')';
+                    if (request('filter.company')) {
+                        return $item->department->name;
+                    }
+                    if (request('filter.department')) {
+                        return $item->company->name;
+                    }
+
+                    return $item->company->name.' ('.$item->department->name.')';
                 })
                 ->map(function (Collection $companyDepartmentGroup) {
-                    if(! request('filter.category')){
-                        return $companyDepartmentGroup->groupBy(fn(Forecast $item) => $item->kpi->category->name)
+                    if (! request('filter.category')) {
+                        return $companyDepartmentGroup->groupBy(fn (Forecast $item) => $item->kpi->category->name)
                             ->map(function (Collection $categoryGroup) {
-                                return $categoryGroup->groupBy(fn(Forecast $item) => $item->kpi->name);
+                                return $categoryGroup->groupBy(fn (Forecast $item) => $item->kpi->name);
                             });
                     } else {
-                        return $companyDepartmentGroup->groupBy(fn(Forecast $item) => $item->kpi->name);
+                        return $companyDepartmentGroup->groupBy(fn (Forecast $item) => $item->kpi->name);
                     }
                 });
         } else {
-            if(! request('filter.category')){
+            if (! request('filter.category')) {
                 $forecasts = $forecasts
-                    ->groupBy(fn(Forecast $item) => $item->kpi->category->name)
+                    ->groupBy(fn (Forecast $item) => $item->kpi->category->name)
                     ->map(function (Collection $categoryGroup) {
-                        return $categoryGroup->groupBy(fn(Forecast $item) => $item->kpi->name);
+                        return $categoryGroup->groupBy(fn (Forecast $item) => $item->kpi->name);
                     });
             } else {
-                $forecasts = $forecasts->groupBy(fn(Forecast $item) => $item->kpi->name);
+                $forecasts = $forecasts->groupBy(fn (Forecast $item) => $item->kpi->name);
             }
         }
 
@@ -81,8 +85,9 @@ class MasterTableController extends Controller
     {
         $forecasts = $this->filterForecasts();
 
-        //export
-        $filename = 'performance-report-' . now()->format('YmdHis') . '.xlsx';
+        // export
+        $filename = 'performance-report-'.now()->format('YmdHis').'.xlsx';
+
         return Excel::download(new PerformanceReportExport($forecasts), $filename);
     }
 }

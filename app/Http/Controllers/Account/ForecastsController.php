@@ -60,7 +60,7 @@ class ForecastsController extends Controller
         ]);
 
         $date = Carbon::create()->month((int) $data['month'])->year((int) $data['year'])->day(1);
-        if($date->isPast()) {
+        if ($date->isPast()) {
             throw ValidationException::withMessages(['month' => 'Month must be in the future.']);
         }
 
@@ -69,7 +69,7 @@ class ForecastsController extends Controller
             ->where('department_id', $data['department_id'])
             ->where('year', $data['year'])
             ->where('month', $data['month']);
-        if($q->exists()) {
+        if ($q->exists()) {
             throw ValidationException::withMessages(['kpi_id' => 'KPI already exists for this company, department and month.']);
         }
 
@@ -93,9 +93,8 @@ class ForecastsController extends Controller
             'target' => ['required'],
         ]);
 
-
         $date = Carbon::create()->month((int) $data['month'])->year((int) $data['year'])->day(1);
-        if($date->isPast()) {
+        if ($date->isPast()) {
             throw ValidationException::withMessages(['month' => 'Month must be in the future.']);
         }
 
@@ -105,7 +104,7 @@ class ForecastsController extends Controller
             ->where('department_id', $data['department_id'])
             ->where('year', $data['year'])
             ->where('month', $data['month']);
-        if($q->exists()) {
+        if ($q->exists()) {
             throw ValidationException::withMessages(['kpi_id' => 'KPI already exists for this company, department and month.']);
         }
 
@@ -114,10 +113,9 @@ class ForecastsController extends Controller
         return redirect(route('account.forecasts.index'))->with(['success' => 'Forecast has been updated successfully']);
     }
 
-
     public function delete(Forecast $forecast)
     {
-        if($forecast->is_submitted) {
+        if ($forecast->is_submitted) {
             abort(403, 'Forecast has been already submitted.');
         }
 
@@ -130,12 +128,11 @@ class ForecastsController extends Controller
     {
         $filePath = $forecast->evidence_filepath;
 
-        if (!Storage::exists($filePath)) {
+        if (! Storage::exists($filePath)) {
             abort(404, 'File not found');
         }
 
         // Send the file as a download
         return Storage::download($filePath);
     }
-
 }

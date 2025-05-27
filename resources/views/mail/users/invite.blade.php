@@ -1,23 +1,37 @@
 <x-mail::message>
-# You're Invited to Join {{ config('app.name') }}
+# Welcome to {{ config('app.name') }}!
 
-Hello {{ $user->name }},
+Hi {{ $user->name }},
 
-You have been invited to register as an agent for Account **{{ $account->name }}**.
-Below is a list of all your current assignments for this account:
+Your account has been created as an agent for the account **{{ $account->name }}**.
 
-@foreach($user->agent_assignments as $assignment)
-- **Company:** {{ $assignment->company->name }} | **Department:** {{ $assignment->department->name }}
-@endforeach
+## Your Assignments
 
-To get started, click the button below to complete your registration:
+<table style="width:75%; margin: 16px auto; border-collapse: collapse;">
+    <thead>
+    <tr>
+        <th style="border:1px solid #dddddd; padding:8px; text-align:left;">Company</th>
+        <th style="border:1px solid #dddddd; padding:8px; text-align:left;">Department</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach($user->agent_assignments as $assignment)
+        <tr>
+            <td style="border:1px solid #dddddd; padding:8px;">{{ $assignment->company->name }}</td>
+            <td style="border:1px solid #dddddd; padding:8px;">{{ $assignment->department->name }}</td>
+        </tr>
+    @endforeach
+    </tbody>
+</table>
+
+To activate your account and set your password, please click the button below:
 
 <x-mail::button :url="$url">
-    Register Now
+    Set Your Password
 </x-mail::button>
 
 If you did not expect this invitation, you can safely ignore this email.
 
-Thanks,<br>
+Best regards,
 {{ config('app.name') }}
 </x-mail::message>

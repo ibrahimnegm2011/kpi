@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\MeasureUnit;
 use App\Enums\Permission;
 use App\Enums\UserType;
 use App\Models\Account;
@@ -47,7 +46,7 @@ class DatabaseSeeder extends Seeder
             'account_id' => $account->id,
             'name' => 'Account 1',
             'email' => 'account1@sirc.sa',
-            'type' => UserType::ACCOUNT()
+            'type' => UserType::ACCOUNT(),
         ]);
         $account->update(['admin_user_id' => $accUser->id]);
 
@@ -58,8 +57,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-
-        Company::factory()->create(['name' => 'SIRC', 'account_id' => $account->id]);;
+        Company::factory()->create(['name' => 'SIRC', 'account_id' => $account->id]);
         Company::factory()->create(['name' => 'REVIVA', 'account_id' => $account->id]);
         Company::factory()->create(['name' => 'AKAM', 'account_id' => $account->id]);
         Company::factory()->create(['name' => 'SAIL', 'account_id' => $account->id]);
@@ -80,24 +78,24 @@ class DatabaseSeeder extends Seeder
         Kpi::factory()->create([
             'account_id' => $account->id, 'category_id' => $cat1->id, 'name' => 'Increase Number of Visits of Website',
             'definition' => 'Increase Number of Visits of Website', 'equation' => 'Increase Number of Visits of Website',
-            'unit_of_measurement' => 'Number of Visits', 'symbol' => 'V'
+            'unit_of_measurement' => 'Number of Visits', 'symbol' => 'V',
         ]);
         Kpi::factory()->create([
             'account_id' => $account->id, 'category_id' => $cat2->id, 'name' => 'Increase Number of Projects',
             'definition' => 'Increase Number of Projects', 'equation' => 'Increase Number of Projects',
-            'unit_of_measurement' => 'Number of Projects', 'symbol' => 'P'
+            'unit_of_measurement' => 'Number of Projects', 'symbol' => 'P',
         ]);
         Kpi::factory()->create([
             'account_id' => $account->id, 'category_id' => $cat3->id, 'name' => 'Increase Sales of Projects',
             'definition' => 'Increase Sales of Projects', 'equation' => 'Increase Sales of Projects',
-            'unit_of_measurement' => 'Amount of Revenue', 'symbol' => 'SAR'
+            'unit_of_measurement' => 'Amount of Revenue', 'symbol' => 'SAR',
         ]);
 
-        if(app()->environment('local')) {
+        if (app()->environment('local')) {
             $dates = [
                 now()->subMonth(),
                 now()->lastOfMonth(),
-                now()->addMonths(2)
+                now()->addMonths(2),
             ];
             $companies = Company::forAccount($account->id);
             foreach ($companies as $company) {
@@ -121,7 +119,7 @@ class DatabaseSeeder extends Seeder
                     foreach ($kpis as $kpi) {
                         $date = Arr::random($dates);
                         $submissionFields = [];
-                        if(Arr::random([true, false])){
+                        if (Arr::random([true, false])) {
                             $submissionFields = [
                                 'is_submitted' => true,
                                 'submitted_at' => now(),

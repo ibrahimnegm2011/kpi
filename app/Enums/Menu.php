@@ -73,7 +73,7 @@ enum Menu: string
         return match ($this->name) {
             'DASHBOARD' => 'home',
 
-//            'AGENT_DASHBOARD' => 'agent.dashboard',
+            //            'AGENT_DASHBOARD' => 'agent.dashboard',
             'AGENT_KPIS' => 'agent.kpis',
             'AGENT_SUBMITTED_KPIS' => 'agent.submitted_kpis',
             'AGENT_OVERDUE_KPIS' => 'agent.overdue_kpis',
@@ -97,18 +97,21 @@ enum Menu: string
 
     public function isActive()
     {
-        if(in_array($this, $this->adminItems())) {
+        if (in_array($this, $this->adminItems())) {
             $segments = explode('.', $this->route());
+
             return $segments[0] == 'admin' && str_contains(request()->route()->getName(), $segments[1]);
         }
 
-        if(in_array($this, $this->agentItems())) {
+        if (in_array($this, $this->agentItems())) {
             $segments = explode('.', $this->route());
+
             return $segments[0] == 'agent' && request()->route()->getName() === $this->route();
         }
 
-        if(in_array($this, $this->accountItems())) {
+        if (in_array($this, $this->accountItems())) {
             $segments = explode('.', $this->route());
+
             return $segments[0] == 'account' && str_contains(request()->route()->getName(), $segments[1]);
         }
 
@@ -138,7 +141,7 @@ enum Menu: string
     public static function agentItems()
     {
         return [
-//            Menu::AGENT_DASHBOARD,
+            //            Menu::AGENT_DASHBOARD,
             Menu::AGENT_KPIS,
             Menu::AGENT_OVERDUE_KPIS,
             Menu::AGENT_SUBMITTED_KPIS,
@@ -148,11 +151,12 @@ enum Menu: string
     public static function adminItems()
     {
         return [
-//            Menu::ADMIN_DASHBOARD,
+            //            Menu::ADMIN_DASHBOARD,
             Menu::ADMIN_ACCOUNTS,
             Menu::ADMIN_USERS,
         ];
     }
+
     public static function accountItems()
     {
         return [

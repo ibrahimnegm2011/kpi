@@ -1,7 +1,5 @@
 <?php
 
-use App\Enums\Permission;
-
 use App\Http\Controllers\Account\ForecastsController;
 use App\Http\Controllers\Agent\AccountChangeController;
 use App\Http\Controllers\Agent\DashboardController;
@@ -19,11 +17,11 @@ Route::prefix('agent')->name('agent.')->namespace('App\Http\Controllers\Agent')-
 
         Route::post('account/select', AccountChangeController::class)->name('account.change');
 
-        Route::get('/kpis',[ KpisController::class, 'index'])->name('kpis');
-        Route::get('/done-kpis',[ KpisController::class, 'submitted'])->name('submitted_kpis');
-        Route::get('/overdue-kpis',[ KpisController::class, 'overdue'])->name('overdue_kpis');
-        Route::get('/submit/{forecast}',[ KpisController::class, 'form'])->name('kpi_submit_form');
-        Route::post('/submit/{forecast}',[ KpisController::class, 'submit'])->name('kpi_submit');
+        Route::get('/kpis', [KpisController::class, 'index'])->name('kpis');
+        Route::get('/done-kpis', [KpisController::class, 'submitted'])->name('submitted_kpis');
+        Route::get('/overdue-kpis', [KpisController::class, 'overdue'])->name('overdue_kpis');
+        Route::get('/submit/{forecast}', [KpisController::class, 'form'])->name('kpi_submit_form');
+        Route::post('/submit/{forecast}', [KpisController::class, 'submit'])->name('kpi_submit');
     });
     Route::get('/forecasts/{forecast}/download', [ForecastsController::class, 'downloadEvidence'])->name('forecasts.download');
 });

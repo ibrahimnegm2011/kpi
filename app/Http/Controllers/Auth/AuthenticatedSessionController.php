@@ -53,7 +53,7 @@ class AuthenticatedSessionController extends Controller
             }
         }
 
-        if($user->type == UserType::AGENT){
+        if ($user->type == UserType::AGENT) {
             if (Str::startsWith($intendedPath, '/agent')) {
                 return redirect()->intended(route('home', absolute: false));
             } else {
@@ -61,7 +61,7 @@ class AuthenticatedSessionController extends Controller
             }
         }
 
-        if(!Str::startsWith($intendedPath, 'admin') || ! Str::startsWith($intendedPath, 'agent') ){
+        if (! Str::startsWith($intendedPath, 'admin') || ! Str::startsWith($intendedPath, 'agent')) {
             return redirect()->intended(route('home', absolute: false));
         }
 

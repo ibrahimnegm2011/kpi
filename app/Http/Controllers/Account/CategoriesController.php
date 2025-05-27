@@ -39,7 +39,7 @@ class CategoriesController extends Controller
         $data = $request->validate([
             'name' => [
                 'required', 'string',
-                Rule::unique('categories', 'name')->where('account_id', Auth::user()->account_id)
+                Rule::unique('categories', 'name')->where('account_id', Auth::user()->account_id),
             ],
             'description' => ['nullable', 'string'],
         ]);
@@ -58,7 +58,7 @@ class CategoriesController extends Controller
             'name' => [
                 'required', 'string',
                 Rule::unique('categories', 'name')->ignoreModel($category)
-                    ->where('account_id', Auth::user()->account_id)
+                    ->where('account_id', Auth::user()->account_id),
             ],
             'description' => ['nullable', 'string'],
         ]);
@@ -70,8 +70,8 @@ class CategoriesController extends Controller
 
     public function delete(Category $category)
     {
-        //TODO: check the model is related to the current account or not
-        if(Kpi::where('category_id', $category->id)->count() > 0) {
+        // TODO: check the model is related to the current account or not
+        if (Kpi::where('category_id', $category->id)->count() > 0) {
             return redirect(route('account.categories.index'))->with(['error' => 'Category has kpis. Please delete them first.']);
         }
 

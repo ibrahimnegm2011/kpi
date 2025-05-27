@@ -9,7 +9,6 @@ use App\Models\Forecast;
 use App\Models\Kpi;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Carbon;
 
 class ForecastFactory extends Factory
 {

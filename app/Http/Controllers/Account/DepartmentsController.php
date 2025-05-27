@@ -41,7 +41,7 @@ class DepartmentsController extends Controller
             'name' => [
                 'required', 'string',
                 Rule::unique('departments', 'name')
-                    ->where('account_id', Auth::user()->account_id)
+                    ->where('account_id', Auth::user()->account_id),
             ],
         ]);
 
@@ -59,7 +59,7 @@ class DepartmentsController extends Controller
             'name' => [
                 'required', 'string',
                 Rule::unique('departments', 'name')->ignoreModel($department)
-                    ->where('account_id', Auth::user()->account_id)
+                    ->where('account_id', Auth::user()->account_id),
             ],            'description' => ['nullable', 'string'],
         ]);
 
@@ -70,11 +70,11 @@ class DepartmentsController extends Controller
 
     public function delete(Department $department)
     {
-        if(AgentAssignment::where('department_id', $department->id)->count() > 0) {
+        if (AgentAssignment::where('department_id', $department->id)->count() > 0) {
             return redirect(route('account.departments.index'))->with(['error' => 'Department has assigned to agents. Please delete them first.']);
         }
 
-        if(Forecast::where('department_id', $department->id)->count() > 0) {
+        if (Forecast::where('department_id', $department->id)->count() > 0) {
             return redirect(route('account.departments.index'))->with(['error' => 'Department has forecasts. Please delete them first.']);
         }
         $department->delete();

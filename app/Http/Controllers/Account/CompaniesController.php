@@ -40,7 +40,7 @@ class CompaniesController extends Controller
         $data = $request->validate([
             'name' => [
                 'required', 'string',
-                Rule::unique('companies', 'name')->where('account_id', Auth::user()->account_id)
+                Rule::unique('companies', 'name')->where('account_id', Auth::user()->account_id),
             ],
             'description' => ['nullable', 'string'],
         ]);
@@ -59,7 +59,7 @@ class CompaniesController extends Controller
             'name' => [
                 'required', 'string',
                 Rule::unique('companies', 'name')->ignoreModel($company)
-                    ->where('account_id', Auth::user()->account_id)
+                    ->where('account_id', Auth::user()->account_id),
             ],
             'description' => ['nullable', 'string'],
         ]);
@@ -71,11 +71,11 @@ class CompaniesController extends Controller
 
     public function delete(Company $company)
     {
-        if(AgentAssignment::where('company_id', $company->id)->count() > 0) {
+        if (AgentAssignment::where('company_id', $company->id)->count() > 0) {
             return redirect(route('account.companies.index'))->with(['error' => 'Company has assigned to agents. Please delete them first.']);
         }
 
-        if(Forecast::where('company_id', $company->id)->count() > 0) {
+        if (Forecast::where('company_id', $company->id)->count() > 0) {
             return redirect(route('account.companies.index'))->with(['error' => 'Company has forecasts. Please delete them first.']);
         }
 

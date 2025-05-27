@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use App\Enums\MeasureUnit;
 use App\Models\Traits\HasAccount;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -17,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
  */
 class Forecast extends Model
 {
-    use HasUlids, HasFactory, HasAccount;
+    use HasAccount, HasFactory, HasUlids;
 
     protected $guarded = [];
 
@@ -81,5 +79,4 @@ class Forecast extends Model
             });
         });
     }
-
 }
