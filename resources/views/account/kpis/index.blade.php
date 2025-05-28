@@ -29,17 +29,17 @@
                 <div class="flex gap-3 mt-5">
                     <div class="inline-flex rounded-md shadow-sm" role="group">
                         <button type="button"
-                                class="px-4 py-2 border border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === null || request('filter.active') === '' ? 'bg-secondary-300 text-white' : '' }}"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === null || request('filter.active') === '' ? 'bg-secondary-300 text-white' : '' }}"
                                 onclick="setActive('')">
                             All
                         </button>
                         <button type="button"
-                                class="px-4 py-2 border-t border-b border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '1' ? 'bg-secondary-300 text-white' : '' }}"
+                                class="px-4 py-2 border-t border-b border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '1' ? ' bg-secondary-300 text-white' : '' }}"
                                 onclick="setActive('1')">
                             Active
                         </button>
                         <button type="button"
-                                class="px-4 py-2 border border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '0' ? 'bg-secondary-300 text-white' : '' }}"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '0' ? ' bg-secondary-300 text-white' : '' }}"
                                 onclick="setActive('0')">
                             Inactive
                         </button>
@@ -75,7 +75,7 @@
                 <tbody>
                 @if(! $kpis->count())
                     <tr class="hover:bg-gray-100">
-                        <td colspan="6" class="py-4 px-6 border-b border-grey-light"> No kpis found. </td>
+                        <td colspan="6" class="py-4 px-6 border-b border-grey-light"> No KPIs found. </td>
                     </tr>
                 @endif
                 @foreach($kpis as $kpi)
