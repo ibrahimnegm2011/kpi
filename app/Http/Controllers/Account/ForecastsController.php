@@ -93,10 +93,10 @@ class ForecastsController extends Controller
             'target' => ['required'],
         ]);
 
-        $date = Carbon::create()->month((int) $data['month'])->year((int) $data['year'])->day(1);
-        if ($date->isPast()) {
-            throw ValidationException::withMessages(['month' => 'Month must be in the future.']);
-        }
+//        $date = Carbon::create()->month((int) $data['month'])->year((int) $data['year'])->day(1);
+//        if ($date->isPast()) {
+//            throw ValidationException::withMessages(['month' => 'Month must be in the future.']);
+//        }
 
         $q = Forecast::whereNot('id', $forecast->id)
             ->where('kpi_id', $data['kpi_id'])
