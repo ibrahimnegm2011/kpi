@@ -14,16 +14,14 @@
 <body class="bg-[#deebec] font-family-karla flex m-0 max-h-screen">
 
 <aside class="bg-primary-500 w-64 hidden shadow-xl sm:flex sm:flex-col sm:justify-items-start">
-    <div class="py-4 px-6">
+    <div class="py-3 px-6">
         <a href="{{route('home')}}"
            class="text-white font-semibold flex items-center">
-            <img src="{{url('images/logo-white.png')}}" class="mr-4 h-8 inline"/>
-            <div class="w-64">{{config('app.name')}}</div>
+            <img src="{{url('images/logo-white.png')}}" class="mx-auto h-10 inline"/>
         </a>
     </div>
     <nav class="text-white text-base font-semibold h-full overflow-auto no-scrollbar">
         @foreach(Menu::items() as $item)
-            @php ! $item instanceof Menu && dd($item)@endphp
             @if(!$item->isGroup() && Auth::user()->hasPermission($item->value))
                 <a href="{{route($item->route())}}"
                    class="flex items-center text-white opacity-75 hover:opacity-100 py-4 pl-6 nav-item {{$item->isActive() ? 'bg-primary-600' : ''}}">
@@ -37,10 +35,48 @@
 
 <div class=" w-full h-screen flex flex-col  overflow-y-hidden">
     <!-- Desktop Header -->
-    <header class="w-full items-center bg-white py-2 px-6 hidden sm:flex">
-        <div class="w-1/2">
-            {{-- For Agent Users Select Account --}}
-            @php $accounts = Auth::user()->agentAccounts(); @endphp
+    <header class="w-full items-center bg-white py-2 px-3 hidden sm:flex">
+        <div class="w-1/2 text-xl">{{config('app.name')}}</div>
+        <div class="w-1/2 flex justify-end gap-2">
+            <div class="min-w-40">
+                {{-- For Agent Users Select Account --}}
+                @php $accounts = Auth::user()->agentAccounts(); @endphp
+                @if(Auth::user()->type == \App\Enums\UserType::AGENT && $accounts->count() > 1)
+                    <form method="post" id="account-form" action="{{route('agent.account.change')}}">
+                        @csrf
+                        <select name="accountId" class="max-w-xs w-full" onchange="this.form.submit()">
+                            @foreach($accounts as $account)
+                                <option value="{{$account->id}}" {{session('selected_account') !== $account->id ? '' : 'selected' }}>
+                                    {{$account->name}}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                @endif
+            </div>
+            <div x-data="{ isOpen: false }" class="relative">
+                <button @click="isOpen = !isOpen"
+                        class="realtive z-10 w-28 h-12 overflow-hidden hover:bg-gray-100 focus:bg-gray-100 focus:outline-none">
+                    <i class="fas fa-user ml-2"></i>
+                    {{auth()->user()->name}}
+                </button>
+                <form x-show="isOpen" class="absolute w-32 bg-white rounded-lg shadow-lg mr-3" method="POST"
+                      action="{{route('logout')}}">
+                    @csrf
+                    <button type="submit" class="block px-4 py-2 w-full account-link hover:bg-secondary-200">Log Out</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Header & Nav -->
+    <header x-data="{ isOpen: false }" class="w-full bg-primary-500 py-5 px-6 sm:hidden max-h-[33vh] overflow-y-auto">
+        <div class="flex items-center justify-between">
+            <a href="{{route('home')}}"
+               class="text-white text-xl font-semibold uppercase flex items-center">
+                <img src="{{url('images/logo-white.png')}}" class="mr-1 h-8 inline"/>
+                KMS
+            </a>
             @if(Auth::user()->type == \App\Enums\UserType::AGENT && $accounts->count() > 1)
                 <form method="post" id="account-form" action="{{route('agent.account.change')}}">
                     @csrf
@@ -53,28 +89,6 @@
                     </select>
                 </form>
             @endif
-        </div>
-        <div x-data="{ isOpen: false }" class="relative w-1/2 flex justify-end">
-            <button @click="isOpen = !isOpen"
-                    class="realtive z-10 w-32 h-12 overflow-hidden hover:bg-gray-100 focus:bg-gray-100 focus:outline-none">
-                {{auth()->user()->name}}
-            </button>
-            <form x-show="isOpen" class="absolute w-32 bg-white rounded-lg shadow-lg py-2 mt-10" method="POST"
-                  action="{{route('logout')}}">
-                @csrf
-                <button type="submit" class="block px-4 py-2 w-full account-link hover:text-white">Log Out</button>
-            </form>
-        </div>
-    </header>
-
-    <!-- Mobile Header & Nav -->
-    <header x-data="{ isOpen: false }" class="w-full bg-sidebar py-5 px-6 sm:hidden">
-        <div class="flex items-center justify-between">
-            <a href="{{route('home')}}"
-               class="text-white text-xl font-semibold uppercase flex items-center">
-                <img src="{{url('assets/images/logo-white.png')}}" class="mr-1 h-8 inline"/>
-                {{config('app.name')}}
-            </a>
             <button @click="isOpen = !isOpen" class="text-white text-3xl focus:outline-none">
                 <i x-show="!isOpen" class="fas fa-bars"></i>
                 <i x-show="isOpen" class="fas fa-times"></i>
@@ -82,7 +96,7 @@
         </div>
 
         <!-- Dropdown Nav -->
-        <nav :class="isOpen ? 'flex': 'hidden'" class="flex flex-col pt-4">
+        <nav x-show="isOpen" class="flex flex-col pt-4">
             @foreach(Menu::items() as $menu)
                 @if(!$menu->isGroup() && Auth::user()->hasPermission($menu->value))
                     <a href="{{route($menu->route())}}"
@@ -92,6 +106,20 @@
                     </a>
                 @endif
             @endforeach
+
+            <div class="flex justify-between gap-3">
+                <div class="content-center text-white">
+                    <i class="fas fa-user ml-2"></i>
+                    {{auth()->user()->name}}
+                </div>
+                <form x-show="isOpen" method="POST"
+                      action="{{route('logout')}}">
+                    @csrf
+                    <button type="submit" class="px-2 py-1 bg-white rounded-lg shadow-lg hover:bg-secondary-200">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+            </div>
         </nav>
     </header>
 

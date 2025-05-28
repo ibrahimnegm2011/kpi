@@ -27,7 +27,7 @@ class MasterTableController extends Controller
         }
 
         return $forecastsQ
-            ->orderBy('month', 'desc')
+            ->orderBy('month')
             ->orderBy('company_id')
             ->get();
     }
