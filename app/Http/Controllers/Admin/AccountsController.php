@@ -99,7 +99,7 @@ class AccountsController extends Controller
     {
         foreach (['companies', 'departments'] as $relation) {
             if ($account->$relation()->count() > 0) {
-                abort(403, 'Account has '.$relation.'. Please delete them first.');
+                return redirect(route('admin.accounts.index'))->with(['error' => 'Account has '.$relation.'. Please delete them first.']);
             }
         }
 

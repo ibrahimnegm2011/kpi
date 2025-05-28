@@ -14,8 +14,12 @@ class OnboardingController extends Controller
 {
     public function form(Request $request, ?User $user = null)
     {
-        if (! $request->hasValidSignature() || $user->type != UserType::ACCOUNT || $user->onboarded_at) {
+        if (! $request->hasValidSignature() || $user->type != UserType::ACCOUNT) {
             abort(401);
+        }
+
+        if($user->onboarded_at) {
+            return redirect(route('login'))->with(['status' => 'This email has already registered. Please login with your credentials.']);
         }
 
         $user->loadMissing('account');

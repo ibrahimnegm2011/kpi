@@ -29,6 +29,7 @@ class ForecastsController extends Controller
                 AllowedFilter::scope('submitted'),
             ])
                 ->where('account_id', Auth::user()->account_id)
+                ->whereHas('kpi', fn ($q)  => $q->active(true))
                 ->paginate(10)->withQueryString(),
         ]);
     }

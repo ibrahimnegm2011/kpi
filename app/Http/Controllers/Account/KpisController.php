@@ -39,13 +39,13 @@ class KpisController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => ['required', 'string'],
+            'name' => ['required', 'string', Rule::unique('kpis', 'name')->where('account_id', Auth::user()->account_id)],
             'category_id' => ['required', Rule::exists('categories', 'id')],
             'definition' => ['nullable', 'string'],
             'equation' => ['nullable', 'string'],
             'unit_of_measurement' => ['nullable', 'string'],
             'symbol' => ['nullable', 'string'],
-            'is_active' => ['required', 'boolean'],
+            'is_active' => ['sometimes', 'boolean'],
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
@@ -61,13 +61,13 @@ class KpisController extends Controller
     public function update(Kpi $kpi, Request $request)
     {
         $data = $request->validate([
-            'name' => ['required', 'string'],
+            'name' => ['required', 'string', Rule::unique('kpis', 'name')->ignoreModel($kpi)->where('account_id', Auth::user()->account_id)],
             'category_id' => ['required', Rule::exists('categories', 'id')],
             'definition' => ['nullable', 'string'],
             'equation' => ['nullable', 'string'],
             'unit_of_measurement' => ['nullable', 'string'],
             'symbol' => ['nullable', 'string'],
-            'is_active' => ['required', 'boolean'],
+            'is_active' => ['sometimes', 'boolean'],
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
@@ -91,7 +91,7 @@ class KpisController extends Controller
     public function byCategory(Category $category)
     {
         return response()->json(
-            Kpi::where('category_id', $category->id)
+            Kpi::active(true)->where('category_id', $category->id)
                 ->where('account_id', Auth::user()->account_id)
                 ->get(['id', 'name'])
         );

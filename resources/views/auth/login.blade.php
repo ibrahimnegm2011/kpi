@@ -5,7 +5,6 @@
     <x-auth-session-status class="mb-4" :status="session('status')" />
     @error('email')
     <x-auth-session-status class="mb-4 p-2 bg-red-100 text-red-500 italic font-bold" :status="$message" />
-{{--    <p class="p-2 bg-red-100 text-red-500 text-md font-bold italic">{{ $message }}</p> --}}
     @enderror
 
     <form method="POST" action="{{ route('login') }}" class="w-full space-y-4">

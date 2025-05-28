@@ -23,6 +23,29 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
+    protected function handleUserActivation($email)
+    {
+        $user = User::with('account', 'agent_assignments.account')->where('email', $email)->first();
+        if (! $user->is_active) {
+            return 'This user is not active. Contact your administrator.';
+        }
+
+        if($user->type == UserType::ACCOUNT && ! $user->account->is_active) {
+            return 'Your account is not active. Contact your administrator.';
+        }
+
+        if(
+            $user->type == UserType::AGENT &&
+            ! $user->agent_assignments
+                ->pluck('account.is_active')->unique()
+                ->reduce(fn ($carry, $item) => $item || $carry, false)
+        ) {
+            return 'Your accounts is not active. Contact your administrator.';
+        }
+
+        return true;
+    }
+
     /**
      * Handle an incoming authentication request.
      */
@@ -30,13 +53,15 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-        if (! User::where('email', $request->email)->first()->is_active) {
+        $activeHandler = $this->handleUserActivation($request->email);
+
+        if ($activeHandler !== true) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
             throw ValidationException::withMessages([
-                'email' => __('This user is not active. Contact your administrator.'),
+                'email' => __($activeHandler),
             ]);
         }
 

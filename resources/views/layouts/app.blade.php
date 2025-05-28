@@ -105,31 +105,37 @@
             <div class="fixed bottom-0 right-5 max-w-xs w-full">
                 @if(session('success'))
                     <div id="toast-success"
+                         x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition
+                         style="display: none;"
                          class="mb-3 flex items-center justify-between p-4 space-x-4 text-gray-100 bg-green-800 divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow space-x"
                          role="alert">
                         <div class="text-sm font-normal">{{session('success')}}</div>
                         <button type="button"
                                 class="me-auto -mx-1.5 -my-1.5 border-none bg-green-800 items-center justify-center flex-shrink-0 text-gray-400 hover:text-white rounded-lg p-1.5 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
-                                data-dismiss-target="#toast-success" aria-label="Close">
+                                @click="show = false" aria-label="Close">
                             <span class="sr-only">Close</span>
                             <i class="w-3 h-3 fas fa-times"></i>
                         </button>
                     </div>
                 @endif
 
-                @if(session('error'))
-                    <div id="toast-error"
-                         class="mb-3 flex items-center justify-between max-w-xs p-4 space-x-4 text-gray-100 bg-red-800 divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow dark:text-gray-400 dark:divide-gray-700 space-x dark:bg-gray-800"
-                         role="alert">
-                        <div class="text-sm font-normal">{{session('error')}}</div>
-                        <button type="button"
+                    @if(session('error'))
+                        <div id="toast-error"
+                             x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition
+                             style="display: none;"
+                             class="mb-3 flex items-center justify-between max-w-xs p-4 space-x-4 text-gray-100 bg-red-800 divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow dark:text-gray-400 dark:divide-gray-700 space-x dark:bg-gray-800"
+                             role="alert">
+                            <div class="text-sm font-normal">{{ session('error') }}</div>
+                            <button
+                                type="button"
                                 class="me-auto -mx-1.5 -my-1.5 border-none bg-red-800 items-center justify-center flex-shrink-0 text-gray-400 hover:text-white rounded-lg p-1.5 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
-                                data-dismiss-target="#toast-error" aria-label="Close">
-                            <span class="sr-only">Close</span>
-                            <i class="w-3 h-3 fas fa-times"></i>
-                        </button>
-                    </div>
-                @endif
+                                @click="show = false" aria-label="Close">
+                                <span class="sr-only">Close</span>
+                                <i class="w-3 h-3 fas fa-times"></i>
+                            </button>
+                        </div>
+                    @endif
+
             </div>
         </main>
 

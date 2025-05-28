@@ -84,7 +84,7 @@
                         <td class="py-4 px-6 border-b border-grey-light">{{$kpi->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$kpi->category->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$kpi->unit_of_measurement}}</td>
-                        <td class="py-4 px-6 border-b border-grey-light">{{$kpi->is_active ? 'Active': 'Not Active'}}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">{{$kpi->is_active ? 'Active': 'Inactive'}}</td>
                         <td class="py-4 px-6 border-b border-grey-light ">
                             <a class="mx-2 text-secondary-500 hover:text-primary-500" href="{{route('account.kpis.edit', $kpi->id)}}"> <i class="fas fa-edit"></i> </a>
                             <form method="POST" action="{{ route('account.kpis.delete', $kpi) }}" style="display:inline;"

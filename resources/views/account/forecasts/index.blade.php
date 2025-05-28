@@ -66,17 +66,17 @@
                 <div class="flex gap-3 mt-5">
                     <div class="inline-flex rounded-md shadow-sm" role="group">
                         <button type="button"
-                                class="px-4 py-2 border border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.submitted') === null || request('filter.submitted') === '' ? 'bg-secondary-100' : '' }}"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.submitted') === null || request('filter.submitted') === '' ? 'bg-secondary-300 text-white' : '' }}"
                                 onclick="setSubmitted('')">
                             All
                         </button>
                         <button type="button"
-                                class="px-4 py-2 border-t border-b border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.submitted') === '1' ? 'bg-secondary-100' : '' }}"
+                                class="px-4 py-2 border-t border-b border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.submitted') === '1' ? 'bg-secondary-300 text-white' : '' }}"
                                 onclick="setSubmitted('1')">
                             Submitted
                         </button>
                         <button type="button"
-                                class="px-4 py-2 border border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.submitted') === '0' ? 'bg-secondary-100' : '' }}"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.submitted') === '0' ? 'bg-secondary-300 text-white' : '' }}"
                                 onclick="setSubmitted('0')">
                             Not Submitted
                         </button>
@@ -92,7 +92,7 @@
                 <thead>
                 <tr>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                        Kpi
+                        KPI
                     </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                         Month

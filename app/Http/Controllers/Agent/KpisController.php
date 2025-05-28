@@ -20,6 +20,7 @@ class KpisController extends AgentController
                 AllowedFilter::exact('year', 'year'),
                 AllowedFilter::exact('month', 'month'),
             ])
+                ->whereHas('kpi', fn ($q)  => $q->active(true))
                 ->forCurrentAgentAssignments()
                 ->where('is_submitted', false)
                 ->paginate(10)->withQueryString(),
@@ -34,6 +35,7 @@ class KpisController extends AgentController
                 AllowedFilter::exact('year', 'year'),
                 AllowedFilter::exact('month', 'month'),
             ])
+                ->whereHas('kpi', fn ($q)  => $q->active(true))
                 ->where('is_submitted', false)
                 ->where('year', '<=', now()->year)
                 ->where('month', '<', now()->month)
@@ -50,6 +52,7 @@ class KpisController extends AgentController
                 AllowedFilter::exact('year', 'year'),
                 AllowedFilter::exact('month', 'month'),
             ])
+                ->whereHas('kpi', fn ($q)  => $q->active(true))
                 ->where('is_submitted', true)
                 ->forCurrentAgentAssignments()
                 ->paginate(10)->withQueryString(),
@@ -73,6 +76,10 @@ class KpisController extends AgentController
             ],
             'remarks' => ['nullable', 'string'],
         ]);
+
+        if(! $forecast->kpi->is_active) {
+            return redirect(route('agent.kpis'))->with('error', 'KPI is not active.');
+        }
 
         // Handle file upload and store in 'evidence' directory inside storage/app
         if ($request->hasFile('evidence_filepath')) {

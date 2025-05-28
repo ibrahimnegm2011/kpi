@@ -88,9 +88,14 @@ class AgentsController extends Controller
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
-        if (User::where('email', $data['email'])
-            ->whereHas('agent_assignments', fn ($q) => $q->where('id', Auth::user()->account_id))
-            ->exists()) {
+        $user = User::with('agent_assignments')
+            ->where('email', $data['email'])->first();
+
+        if($user && $user->type != UserType::AGENT) {
+            return back()->withErrors(['email' => 'Email already exists in different type.'])->withInput();
+        }
+
+        if ($user && $user->agent_assignments->where('account_id', Auth::user()->account_id)->count()) {
             return back()->withErrors(['email' => 'Email already exists.'])->withInput();
         }
 
@@ -176,9 +181,11 @@ class AgentsController extends Controller
 
         $user->update(Arr::except($data, ['assignments']));
 
-        $this->updateAgentAssignments($user, $data['assignments']);
+        $isUpdated = $this->updateAgentAssignments($user, $data['assignments']);
 
-        return redirect(route('account.agents.index'))->with(['success' => 'User has been updated successfully']);
+        $message = $isUpdated ? 'User has been updated successfully and the agent has been notified' : 'User has been updated successfully.';
+
+        return redirect(route('account.agents.index'))->with(['success' => $message]);
     }
 
     public function delete(User $user)
@@ -188,7 +195,7 @@ class AgentsController extends Controller
         return redirect(route('account.agents.index'))->with(['success' => 'User has been deleted successfully.']);
     }
 
-    private function updateAgentAssignments(User $user, array $assignments)
+    private function updateAgentAssignments(User $user, array $assignments): bool
     {
         $arrayToString = fn ($arr) => json_encode(ksort($arr) ? $arr : $arr);
 
@@ -229,6 +236,12 @@ class AgentsController extends Controller
                 ->where('account_id', Auth::user()->account_id)
                 ->delete();
         }
+
+        //TODO: New email for updating the assignments
+//        Mail::to($user)->sendNow(new InviteAgent(
+//            user: $user,
+//            account: Account::find(Auth::user()->account_id),
+//        ));
 
         return true;
     }

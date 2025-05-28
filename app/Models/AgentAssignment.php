@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
+/**
+ * @property-read User $user
+ * @property-read Account $account
+ */
 class AgentAssignment extends Pivot
 {
     public $table = 'agent_assignments';

@@ -33,11 +33,11 @@ class Kpi extends Model
         return $this->hasMany(Forecast::class);
     }
 
-    public function scopeActive(Builder $query, string $value)
+    public function scopeActive(Builder $query, $value = true)
     {
-        match (intval($value)) {
-            1 => $query->where('is_active', true),
-            0 => $query->where('is_active', false),
+        match (boolval($value)) {
+            true => $query->where('is_active', true),
+            false => $query->where('is_active', false),
             default => '',
         };
 

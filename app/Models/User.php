@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 /**
  * @property string $account_id
  * @property-read Collection<UserPermission> $permissions
+ * @property-read Collection<AgentAssignment> $agent_assignments
  * @property-read Company $company
  * @property-read Department $department
  */

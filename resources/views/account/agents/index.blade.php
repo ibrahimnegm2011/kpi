@@ -12,7 +12,7 @@
 
         <div class="bg-white mt-5 p-4">
             <form method="get" id="search-form">
-                <div class="flex justify-around items-center justify-items-center gap-3">
+                <div class="flex items-center justify-items-center gap-3">
                     <input name="filter[name]" onblur="submitForm()" placeholder="Name"
                            value="{{request('filter.name')}}"
                            class="bg-transparent border-b max-w-xs w-full text-gray-700 py-3 px-4 leading-tight focus:outline-none focus:bg-gray-50">
@@ -41,17 +41,17 @@
                 <div class="flex gap-3 mt-5">
                     <div class="inline-flex rounded-md shadow-sm" role="group">
                         <button type="button"
-                                class="px-4 py-2 border border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === null || request('filter.active') === '' ? 'bg-secondary-100' : '' }}"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === null || request('filter.active') === '' ? 'bg-secondary-300 text-white' : '' }}"
                                 onclick="setActive('')">
                             All
                         </button>
                         <button type="button"
-                                class="px-4 py-2 border-t border-b border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '1' ? 'bg-secondary-100' : '' }}"
+                                class="px-4 py-2 border-t border-b border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '1' ? 'bg-secondary-300 text-white' : '' }}"
                                 onclick="setActive('1')">
                             Active
                         </button>
                         <button type="button"
-                                class="px-4 py-2 border border-secondary-300 text-secondary-700 bg-white hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '0' ? 'bg-secondary-100' : '' }}"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.active') === '0' ? 'bg-secondary-300 text-white' : '' }}"
                                 onclick="setActive('0')">
                             Inactive
                         </button>
