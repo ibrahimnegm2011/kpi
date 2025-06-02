@@ -55,17 +55,50 @@
                 @endif
             </div>
             <div x-data="{ isOpen: false }" class="relative">
-                <button @click="isOpen = !isOpen"
-                        class="realtive z-10 w-28 h-12 overflow-hidden hover:bg-gray-100 focus:bg-gray-100 focus:outline-none">
-                    <i class="fas fa-user ml-2"></i>
-                    {{auth()->user()->name}}
+                <button
+                    @click="isOpen = !isOpen"
+                    @keydown.escape="isOpen = false"
+                    aria-haspopup="true"
+                    :aria-expanded="isOpen.toString()"
+                    class="relative z-10 flex items-center w-44 min-h-12 px-4 py-2 bg-white hover:bg-primary-50 focus:bg-primary-50 focus:outline-none transition"
+                >
+                    <span class="flex flex-col items-start flex-1 min-w-0">
+                        <span class="font-semibold truncate w-full" title="{{ Auth::user()->name }}">{{ Auth::user()->name }}</span>
+                        @if(Auth::user()->account)
+                            <span class="text-xs text-gray-500 truncate w-full" title="{{ Auth::user()->account->name  }}">
+                                {{ Auth::user()->account->name }}
+                            </span>
+                        @endif
+                    </span>
+
+                    <i class="fas fa-chevron-down ml-3 text-gray-400"></i>
                 </button>
-                <form x-show="isOpen" class="absolute w-32 bg-white rounded-lg shadow-lg mr-3" method="POST"
-                      action="{{route('logout')}}">
-                    @csrf
-                    <button type="submit" class="block px-4 py-2 w-full account-link hover:bg-secondary-200">Log Out</button>
-                </form>
+
+                <div x-show="isOpen" @click.away="isOpen = false"
+                    x-transition:enter="transition ease-out duration-150"
+                    x-transition:enter-start="opacity-0 -translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-100"
+                    x-transition:leave-start="opacity-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 -translate-y-2"
+                    class="absolute right-0 w-44 rounded-lg shadow-lg bg-white z-20 border border-gray-100"
+                    style="display: none;"
+                    tabindex="-1">
+{{--                    <a href="#" class="flex items-center w-full px-4 py-2 text-left text-gray-700 hover:bg-primary-50 transition">--}}
+{{--                        <i class="fas fa-user mr-2"></i> Profile--}}
+{{--                    </a>--}}
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button
+                            type="submit"
+                            class="flex items-center w-full px-4 py-2 text-left text-gray-700 hover:bg-primary-50 transition"
+                        >
+                            <i class="fas fa-sign-out-alt mr-2"></i> Log Out
+                        </button>
+                    </form>
+                </div>
             </div>
+
         </div>
     </header>
 

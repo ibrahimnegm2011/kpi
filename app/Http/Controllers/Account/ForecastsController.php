@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
+use App\Imports\ForecastsImport;
 use App\Models\Forecast;
+use App\Models\Kpi;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -12,6 +14,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -135,5 +140,72 @@ class ForecastsController extends Controller
 
         // Send the file as a download
         return Storage::download($filePath);
+    }
+
+    public function sample()
+    {
+        $data = Kpi::active(true)
+            ->with('category')
+            ->get()->map(fn(Kpi $kpi) => [
+                'Category' => $kpi->category->name,
+                'KPI' => $kpi->name,
+                'Definition' => $kpi->definition,
+                'Year' => date('Y'),
+                'Month' => '',
+                'Company' => '',
+                'Department' => '',
+                'Target' => '',
+            ]);
+
+        return Excel::download(new class($data) implements FromCollection, WithHeadings {
+            public function __construct(protected $data)
+            {}
+
+            public function collection()
+            {
+                return $this->data;
+            }
+
+            public function headings(): array
+            {
+                return [
+                    'Category', 'KPI', 'Definition', 'Year', 'Month', 'Company', 'Department', 'Target',
+                ];
+            }
+        }, 'forecasts-sample-'.date('YmdHis').'.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:xlsx,xls|max:2048',
+        ]);
+
+        $import = new ForecastsImport();
+        Excel::import($import, $request->file('import_file'));
+
+        if ($import->tooManyRows) {
+            return back()->withErrors('The file cannot contain more than 100 rows.');
+        }
+
+        if (!empty($import->errors)) {
+            $flatErrors = [];
+
+            foreach ($import->errors as $line => $messages) {
+                foreach ($messages as $message) {
+                    $flatErrors[] = "Row {$line}: {$message}";
+                }
+            }
+
+            return back()->withErrors($flatErrors);
+        }
+
+        dd($import->validRows);
+
+        foreach ($import->validRows as $row) {
+            Forecast::create($row);
+        }
+
+        return back()->with('success', count($import->validRows) . ' forecasts imported successfully.');
     }
 }
