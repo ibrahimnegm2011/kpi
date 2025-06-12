@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\ClosedOption;
+use App\Enums\ReminderOption;
 use App\Models\Traits\HasAccount;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,7 +26,10 @@ class Forecast extends Model
     {
         return [
             'is_submitted' => 'boolean',
+            'is_closed' => 'boolean',
             'submitted_at' => 'datetime',
+            'auto_close_option' => ClosedOption::class,
+            'reminder_option' => ReminderOption::class,
         ];
     }
 
@@ -56,6 +62,15 @@ class Forecast extends Model
         };
     }
 
+    public function scopeClosed(Builder $query, string $value)
+    {
+        return match (intval($value)) {
+            1 => $query->where('is_closed', true),
+            0 => $query->where('is_closed', false),
+            default => $query,
+        };
+    }
+
     public function scopeForCurrentAgentAssignments($query)
     {
         $userId = Auth::id();
@@ -78,5 +93,18 @@ class Forecast extends Model
                 });
             });
         });
+    }
+
+    public function isSubmittable()
+    {
+        if($this->is_closed) {
+            return false;
+        }
+
+        $date = Carbon::create()->month((int) $this->month)->year((int) $this->year)->day(1);
+        if($date->lessThan(now())) {
+            return false;
+        }
+        return true;
     }
 }

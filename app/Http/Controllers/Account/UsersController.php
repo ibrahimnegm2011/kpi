@@ -25,6 +25,7 @@ class UsersController extends Controller
                 AllowedFilter::scope('active'),
             ])
                 ->where('account_id', Auth::user()->account_id)
+                ->latest()
                 ->paginate(10)->withQueryString(),
         ]);
     }

@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @method static Builder byAccount(string $value)
+ */
 trait HasAccount
 {
     public function scopeByAccount(Builder $query, string $value)

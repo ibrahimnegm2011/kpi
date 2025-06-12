@@ -6,9 +6,10 @@ use App\Models\Forecast;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class PerformanceReportExport implements FromCollection, withHeadings
+class PerformanceReportExport implements FromCollection, ShouldAutoSize, withHeadings
 {
     /**
      * @param  Collection<Forecast>  $data
@@ -36,6 +37,9 @@ class PerformanceReportExport implements FromCollection, withHeadings
                 'Percentage' => ($forecast->value && $forecast->target != 0)
                     ? round($forecast->value / $forecast->target * 100, 1).'%'
                     : '-',
+                'Variance' => ($forecast->value && $forecast->target != 0)
+                    ? 1 - round($forecast->value / $forecast->target, 2)
+                    : '-',
                 'Remarks' => $forecast->remarks,
             ];
         });
@@ -48,7 +52,7 @@ class PerformanceReportExport implements FromCollection, withHeadings
             'Definition', 'Equation', 'Unit',
             'Company', 'Department',
             'Year', 'Month',
-            'Target', 'Value', 'Percentage',
+            'Target', 'Value', 'Percentage', 'Variance',
             'Remarks',
         ];
     }

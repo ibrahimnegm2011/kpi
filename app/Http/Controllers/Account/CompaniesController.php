@@ -22,7 +22,7 @@ class CompaniesController extends Controller
                 AllowedFilter::partial('name'),
             ])
                 ->where('account_id', Auth::user()->account_id)
-                ->paginate(10)->withQueryString(),
+                ->latest()->paginate(10)->withQueryString(),
         ]);
     }
 

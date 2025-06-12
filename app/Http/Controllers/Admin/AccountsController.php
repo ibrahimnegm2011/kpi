@@ -23,7 +23,8 @@ class AccountsController extends Controller
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('contact_name'),
                 AllowedFilter::partial('contact_email'),
-            ])->paginate(10)->withQueryString(),
+            ])->latest()
+                ->paginate(10)->withQueryString(),
         ]);
     }
 

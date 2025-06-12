@@ -125,6 +125,25 @@
                         </button>
                         <input type="hidden" name="filter[submitted]" id="filterSubmitted" value="{{ request('filter.submitted') }}">
                     </div>
+
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                        <button type="button"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.closed') === null || request('filter.closed') === '' ? 'bg-secondary-300 text-white' : '' }}"
+                                onclick="setClosed('')">
+                            All
+                        </button>
+                        <button type="button"
+                                class="px-4 py-2 border-t border-b border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.closed') === '1' ? 'bg-secondary-300 text-white' : '' }}"
+                                onclick="setClosed('1')">
+                            Closed
+                        </button>
+                        <button type="button"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.closed') === '0' ? 'bg-secondary-300 text-white' : '' }}"
+                                onclick="setClosed('0')">
+                            Opened
+                        </button>
+                        <input type="hidden" name="filter[closed]" id="filterClosed" value="{{ request('filter.closed') }}">
+                    </div>
                 </div>
 
                 <input type="submit" style="display:none"/>
@@ -209,6 +228,11 @@
 
             function setSubmitted(value) {
                 document.getElementById('filterSubmitted').value = value;
+                submitForm();
+            }
+
+            function setClosed(value) {
+                document.getElementById('filterClosed').value = value;
                 submitForm();
             }
 

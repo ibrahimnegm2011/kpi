@@ -59,6 +59,9 @@
                         Category
                     </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                        Department
+                    </th>
+                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                         Month
                     </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
@@ -68,10 +71,7 @@
                         Value
                     </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                        Remarks
-                    </th>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                        Evidence
+
                     </th>
                 </tr>
                 </thead>
@@ -86,16 +86,22 @@
                         <td class="py-4 px-6 border-b border-grey-light">{{$loop->iteration}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->category->name}}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">{{$forecast->company->name}} - {{$forecast->department->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{\Carbon\Carbon::create()->month($forecast->month)->year($forecast->year)->format('F, Y')}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->target}}</td>
                         <td class="py-4 px-6 border-b border-grey-light" title="{{$forecast->submitted_at}}">{{$forecast->value}}</td>
-                        <td class="py-4 px-6 border-b border-grey-light truncate max-w-xs" title="{{$forecast->remarks}}">
-                            {{$forecast->remarks}}
-                        </td>
                         <td class="py-4 px-6 border-b border-grey-light">
                             @if($forecast->evidence_filepath)
-                                <a href="{{route('agent.forecasts.download', $forecast)}}" target="_blank">
+                                <a class="mx-1 text-secondary-500 hover:text-primary-500"
+                                   title="Download Evidence"
+                                   href="{{route('agent.forecasts.download', $forecast)}}" target="_blank">
                                     <i class="fas fa-file-download"></i>
+                                </a>
+                            @endif
+
+                            @if(! $forecast->is_closed)
+                                <a class="mx-1 text-secondary-500 hover:text-primary-500" href="{{route('agent.kpi_submit_form', $forecast)}}">
+                                    <i class="fas fa-edit"></i>
                                 </a>
                             @endif
                         </td>
