@@ -18,7 +18,7 @@ class OnboardingController extends Controller
             abort(401);
         }
 
-        if($user->onboarded_at) {
+        if ($user->onboarded_at) {
             return redirect(route('login'))->with(['status' => 'This email has already registered. Please login with your credentials.']);
         }
 

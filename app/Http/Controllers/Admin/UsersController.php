@@ -24,6 +24,7 @@ class UsersController extends Controller
                 AllowedFilter::scope('active'),
             ])
                 ->where('type', UserType::ADMIN())
+                ->latest()
                 ->paginate(10)->withQueryString(),
         ]);
     }

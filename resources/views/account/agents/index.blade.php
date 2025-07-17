@@ -4,7 +4,7 @@
         <div class="flex justify-between mb-5">
             <h1 class="text-3xl text-black"><i class="fas fa-user-tie mr-3"></i> Agents </h1>
             <div class="flex gap-3">
-                <a class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded"
+                <a class="bg-secondary-500 hover:bg-secondary-700 text-white font-bold py-2 px-4 rounded"
                    href="{{route('account.agents.create')}}">Invite Agent</a>
 
             </div>

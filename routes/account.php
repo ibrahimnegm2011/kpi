@@ -88,6 +88,9 @@ Route::name('account.')->namespace('App\Http\Controllers\Account')->group(functi
             Route::get('/edit/{forecast}', 'form')->name('edit');
             Route::put('/update/{forecast}', 'update')->name('update');
             Route::delete('/{forecast}', 'delete')->name('delete');
+
+            Route::get('/sample', 'sample')->name('sample');
+            Route::post('/import', 'import')->name('import');
         });
         Route::get('/forecasts/{forecast}/download', [ForecastsController::class, 'downloadEvidence'])->name('forecasts.download');
 

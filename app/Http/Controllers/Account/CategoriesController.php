@@ -21,6 +21,7 @@ class CategoriesController extends Controller
                 AllowedFilter::partial('name'),
             ])
                 ->where('account_id', Auth::user()->account_id)
+                ->latest()
                 ->paginate(10)->withQueryString(),
         ]);
     }

@@ -1,3 +1,4 @@
+@php use App\Models\Forecast;use Carbon\Carbon; @endphp
 <x-app-layout>
     <div class="w-full mt-1">
         <div class="flex justify-between mb-5">
@@ -10,7 +11,8 @@
                     <select name="filter[category]" class="max-w-xs w-full" onchange="submitForm()">
                         <option selected value="">All Categories</option>
                         @foreach(\App\Models\Category::forAccount(session('selected_account')) as $category)
-                            <option value="{{$category->id}}" {{request('filter.category') !== $category->id ? '' : 'selected' }}>
+                            <option
+                                value="{{$category->id}}" {{request('filter.category') !== $category->id ? '' : 'selected' }}>
                                 {{$category->name}}
                             </option>
                         @endforeach
@@ -18,8 +20,8 @@
                     <select name="filter[year]" class="max-w-xs w-full" onchange="submitForm()">
                         <option selected value="">All Years</option>
                         @php
-                            $minYear = \App\Models\Forecast::min('year') ?? date('Y');
-                            $maxYear = \App\Models\Forecast::max('year') ?? date('Y');
+                            $minYear = Forecast::min('year') ?? date('Y');
+                            $maxYear = Forecast::max('year') ?? date('Y');
                         @endphp
                         @if(isset($minYear) && isset($maxYear))
                             @for($year = $minYear; $year <= $maxYear; $year++)
@@ -33,7 +35,7 @@
                         <option value="">All Months</option>
                         @foreach(range(1, 12) as $m)
                             @php
-                                $monthName = \Carbon\Carbon::create()->month($m)->format('F');
+                                $monthName = Carbon::create()->month($m)->format('F');
                             @endphp
                             <option value="{{ $m }}" {{ request('filter.month') == $m ? 'selected' : '' }}>
                                 {{ $monthName }}
@@ -50,13 +52,13 @@
                 <thead>
                 <tr>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                        #
-                    </th>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                         Kpi
                     </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                         Category
+                    </th>
+                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                        Department
                     </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                         Month
@@ -64,29 +66,28 @@
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                         Target
                     </th>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                        Value
-                    </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light"></th>
                 </tr>
                 </thead>
                 <tbody>
                 @if(! $forecasts->count())
                     <tr class="hover:bg-gray-100">
-                        <td colspan="7" class="py-4 px-6 border-b border-grey-light"> No KPIs found. </td>
+                        <td colspan="7" class="py-4 px-6 border-b border-grey-light"> No KPIs found.</td>
                     </tr>
                 @endif
                 @foreach($forecasts as $forecast)
                     <tr class="hover:bg-gray-100">
-                        <td class="py-4 px-6 border-b border-grey-light">{{$loop->iteration}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->category->name}}</td>
-                        <td class="py-4 px-6 border-b border-grey-light">{{\Carbon\Carbon::create()->month($forecast->month)->year($forecast->year)->format('F, Y')}}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">{{$forecast->company->name}} - {{$forecast->department->name}}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">{{Carbon::create()->month($forecast->month)->year($forecast->year)->format('F, Y')}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->target}}</td>
 
                         <td class="py-4 px-6 border-b border-grey-light ">
-                            <a class="bg-primary-500 hover:bg-secondary-700 text-white font-bold py-2 px-4 rounded"
-                               href="{{route('agent.kpi_submit_form', $forecast)}}">Submit</a>
+                            @if($forecast->isSubmittable())
+                                <a class="bg-primary-500 hover:bg-secondary-700 text-white font-bold py-2 px-4 rounded"
+                                   href="{{route('agent.kpi_submit_form', $forecast)}}">Submit</a>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

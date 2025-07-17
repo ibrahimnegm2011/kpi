@@ -124,6 +124,7 @@ class DatabaseSeeder extends Seeder
                                 'is_submitted' => true,
                                 'submitted_at' => now(),
                                 'submitted_by' => $user->id,
+                                'is_closed' => Arr::random([true, false]),
                                 'value' => rand(1, 10) * 10,
                                 'remarks' => fake()->sentence(),
                                 'evidence_filepath' => 'evidence/increase-number-of-projects_sirc_hr.pdf',

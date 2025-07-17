@@ -20,9 +20,12 @@ class KpisController extends AgentController
                 AllowedFilter::exact('year', 'year'),
                 AllowedFilter::exact('month', 'month'),
             ])
-                ->whereHas('kpi', fn ($q)  => $q->active(true))
-                ->forCurrentAgentAssignments()
+                ->whereHas('kpi', fn ($q) => $q->active(true))
                 ->where('is_submitted', false)
+                ->where('year', '>=', now()->year)
+                ->where('month', '>=', now()->subMonth()->month)
+                ->forCurrentAgentAssignments()
+                ->latest()
                 ->paginate(10)->withQueryString(),
         ]);
     }
@@ -35,11 +38,12 @@ class KpisController extends AgentController
                 AllowedFilter::exact('year', 'year'),
                 AllowedFilter::exact('month', 'month'),
             ])
-                ->whereHas('kpi', fn ($q)  => $q->active(true))
+                ->whereHas('kpi', fn ($q) => $q->active(true))
                 ->where('is_submitted', false)
                 ->where('year', '<=', now()->year)
-                ->where('month', '<', now()->month)
+                ->where('month', '<', now()->subMonth()->month)
                 ->forCurrentAgentAssignments()
+                ->latest()
                 ->paginate(10)->withQueryString(),
         ]);
     }
@@ -52,15 +56,17 @@ class KpisController extends AgentController
                 AllowedFilter::exact('year', 'year'),
                 AllowedFilter::exact('month', 'month'),
             ])
-                ->whereHas('kpi', fn ($q)  => $q->active(true))
+                ->whereHas('kpi', fn ($q) => $q->active(true))
                 ->where('is_submitted', true)
                 ->forCurrentAgentAssignments()
+                ->latest()
                 ->paginate(10)->withQueryString(),
         ]);
     }
 
     public function form(Forecast $forecast)
     {
+        session(['submit_back_url' => url()->previous()]);
         return view('agent.kpis.form', compact('forecast'));
     }
 
@@ -77,7 +83,7 @@ class KpisController extends AgentController
             'remarks' => ['nullable', 'string'],
         ]);
 
-        if(! $forecast->kpi->is_active) {
+        if (! $forecast->kpi->is_active) {
             return redirect(route('agent.kpis'))->with('error', 'KPI is not active.');
         }
 
@@ -110,6 +116,8 @@ class KpisController extends AgentController
 
         $forecast->update($data);
 
-        return redirect(route('agent.kpis'))->with('success', 'KPI has been Submitted successfully!');
+        $backUrl = session('submit_back_url', route('agent.kpis'));
+        session()->forget('submit_back_url');
+        return redirect($backUrl)->with('success', 'KPI has been Submitted successfully!');
     }
 }

@@ -2,8 +2,14 @@
 
 namespace App\Http\Controllers\Account;
 
+use App\Enums\ClosedOption;
+use App\Enums\ReminderOption;
 use App\Http\Controllers\Controller;
+use App\Imports\ForecastsImport;
+use App\Models\Company;
+use App\Models\Department;
 use App\Models\Forecast;
+use App\Models\Kpi;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -12,6 +18,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -27,9 +37,13 @@ class ForecastsController extends Controller
                 AllowedFilter::exact('year', 'year'),
                 AllowedFilter::exact('month', 'month'),
                 AllowedFilter::scope('submitted'),
+                AllowedFilter::scope('closed'),
             ])
                 ->where('account_id', Auth::user()->account_id)
-                ->whereHas('kpi', fn ($q)  => $q->active(true))
+                ->whereHas('kpi', fn ($q) => $q->active(true))
+                ->orderBy('is_closed')
+                ->orderByDesc('created_at')
+                ->latest()
                 ->paginate(10)->withQueryString(),
         ]);
     }
@@ -58,6 +72,9 @@ class ForecastsController extends Controller
             'year' => ['required', 'integer'],
             'month' => ['required', 'integer'],
             'target' => ['required'],
+            'auto_close_option' => ['nullable', Rule::enum(ClosedOption::class)],
+            'auto_close_day' => ['nullable', 'min:1', 'max:31'],
+            'reminder_option' => ['nullable', Rule::enum(ReminderOption::class)],
         ]);
 
 //        $date = Carbon::create()->month((int) $data['month'])->year((int) $data['year'])->day(1);
@@ -77,6 +94,10 @@ class ForecastsController extends Controller
         $data['account_id'] = Auth::user()->account_id;
         $data['created_by'] = Auth::id();
 
+        if($data['auto_close_option'] == ClosedOption::MANUALLY()){
+            $data['auto_close_day'] = null;
+        }
+
         Forecast::create(Arr::except($data, ['category_id']));
 
         return redirect(route('account.forecasts.index'))->with(['success' => 'Forecast has been created successfully']);
@@ -92,6 +113,10 @@ class ForecastsController extends Controller
             'year' => ['required', 'integer'],
             'month' => ['required', 'integer'],
             'target' => ['required'],
+            'auto_close_option' => ['nullable', Rule::enum(ClosedOption::class)],
+            'auto_close_day' => ['nullable', 'min:1', 'max:31'],
+            'reminder_option' => ['nullable', Rule::enum(ReminderOption::class)],
+            'is_closed' => ['sometimes', 'boolean'],
         ]);
 
 //        $date = Carbon::create()->month((int) $data['month'])->year((int) $data['year'])->day(1);
@@ -108,6 +133,12 @@ class ForecastsController extends Controller
         if ($q->exists()) {
             throw ValidationException::withMessages(['kpi_id' => 'KPI already exists for this company, department and month.']);
         }
+
+        if($data['auto_close_option'] == ClosedOption::MANUALLY()){
+            $data['auto_close_day'] = null;
+        }
+
+        $data['is_closed'] = $request->boolean('is_closed');
 
         $forecast->update(Arr::except($data, ['category_id']));
 
@@ -135,5 +166,81 @@ class ForecastsController extends Controller
 
         // Send the file as a download
         return Storage::download($filePath);
+    }
+
+    public function sample()
+    {
+        $kpisCategory = Kpi::byAccount(Auth::user()->account_id)->active(true)
+            ->with('category')->get()
+            ->pluck('category.name', 'name');
+        $kpis = $kpisCategory->keys()->toArray();
+        $companies = Company::byAccount(Auth::user()->account_id)->pluck('name')->toArray();
+        $departments = Department::byAccount(Auth::user()->account_id)->pluck('name')->toArray();
+        $months = ['January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'];
+
+        $maxCount = max(count($kpis), count($companies), count($departments), count($months));
+
+        $data = collect();
+        for ($i = 0; $i < $maxCount; $i++) {
+            $data->push([
+                'Category' => ($kpis[$i] ?? null) ? $kpisCategory[$kpis[$i]] : '',
+                'KPI' => $kpis[$i] ?? '',
+                'Year' => date('Y'),
+                'Month' => $months[$i] ?? '',
+                'Company' => $companies[$i] ?? '',
+                'Department' => $departments[$i] ?? '',
+                'Target' => '',
+            ]);
+        }
+
+        return Excel::download(new class($data) implements FromCollection, ShouldAutoSize, WithHeadings
+        {
+            public function __construct(protected $data) {}
+
+            public function collection()
+            {
+                return $this->data;
+            }
+
+            public function headings(): array
+            {
+                return [
+                    'Category', 'KPI', 'Year', 'Month', 'Company', 'Department', 'Target',
+                ];
+            }
+        }, 'forecasts-sample-'.date('YmdHis').'.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:xlsx,xls|max:2048',
+        ]);
+
+        $import = new ForecastsImport();
+        Excel::import($import, $request->file('import_file'));
+
+        if ($import->tooManyRows) {
+            return back()->withErrors('The file cannot contain more than 100 rows.');
+        }
+
+        if (! empty($import->errors)) {
+            $flatErrors = [];
+
+            foreach ($import->errors as $line => $messages) {
+                foreach ($messages as $message) {
+                    $flatErrors[] = "Row {$line}: {$message}";
+                }
+            }
+
+            return back()->withErrors($flatErrors);
+        }
+
+        foreach ($import->validRows as $row) {
+            Forecast::create($row);
+        }
+
+        return back()->with('success', count($import->validRows).' forecasts imported successfully.');
     }
 }

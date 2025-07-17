@@ -50,9 +50,6 @@
                 <thead>
                 <tr>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                        #
-                    </th>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                         Kpi
                     </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
@@ -78,7 +75,6 @@
                 @endif
                 @foreach($forecasts as $forecast)
                     <tr class="hover:bg-gray-100">
-                        <td class="py-4 px-6 border-b border-grey-light">{{$loop->iteration}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->category->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->company->name}} - {{$forecast->department->name}}</td>
@@ -86,8 +82,10 @@
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->target}}</td>
 
                         <td class="py-4 px-6 border-b border-grey-light ">
-                            <a class="bg-primary-500 hover:bg-secondary-700 text-white font-bold py-2 px-4 rounded"
-                               href="{{route('agent.kpi_submit_form', $forecast)}}">Submit</a>
+                            @if($forecast->isSubmittable())
+                                <a class="bg-primary-500 hover:bg-secondary-700 text-white font-bold py-2 px-4 rounded"
+                                   href="{{route('agent.kpi_submit_form', $forecast)}}">Submit</a>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

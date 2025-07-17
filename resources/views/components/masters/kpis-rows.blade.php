@@ -11,6 +11,7 @@
                 $percentage = ($forecast?->value && $target != 0)
                     ? round($value / $target * 100, 1) . '%'
                     : '-';
+                $variance = ($forecast?->value && $target != 0) ? (1 - round($value / $target, 2)) : '-';
             @endphp
             <td class="h-12 border-b border-grey-light whitespace-nowrap text-center align-middle">
                 @if($forecast)
@@ -21,8 +22,11 @@
                         <div class="w-20 h-full border-x px-4 flex items-center justify-center">
                             {{ $value }}
                         </div>
-                        <div class="w-20 h-full border-x px-4 flex items-center justify-center">
+                        <div class="{{request('filter.analysis', 'percent') != 'percent' ? 'hidden' : 'flex'}}  items-center justify-center w-20 h-full border-x px-4 value-col-percent">
                             {{ $percentage }}
+                        </div>
+                        <div class="{{request('filter.analysis', 'percent') != 'variance' ? 'hidden' : 'flex'}}  items-center justify-center w-20 h-full border-x px-4 value-col-variance">
+                            {{ $variance }}
                         </div>
                     </div>
                 @else

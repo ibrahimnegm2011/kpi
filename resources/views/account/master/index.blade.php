@@ -3,7 +3,7 @@
         <div class="flex justify-between mb-5">
             <h1 class="text-3xl text-black"><i class="fas fa-crosshairs mr-3"></i> Performance Report {{request('filter.year') ?? now()->year}} </h1>
             <div class="flex gap-3">
-                <a class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded"
+                <a class="bg-secondary-500 hover:bg-secondary-700 text-white font-bold py-2 px-4 rounded"
                    href="{{route('account.master.export')}}@if(request()->getQueryString())?{{ request()->getQueryString() }}@endif">
                     Export
                 </a>
@@ -51,6 +51,17 @@
                             </option>
                         @endforeach
                     </select>
+
+                    <div class="flex flex-col min-w-16 items-center gap-1" id="toggle-variance">
+                        <label>
+                            <input type="radio" name="filter[analysis]" value="percent"  {{request('filter.analysis', 'percent') == 'percent' ? 'checked' : ''}}> %
+                        </label>
+                        <label>
+                            <input type="radio" name="filter[analysis]" value="variance" {{request('filter.analysis', 'percent') == 'variance' ? 'checked' : ''}}> V
+                        </label>
+                    </div>
+
+
                 </div>
 
                 <input type="submit" style="display:none"/>
@@ -67,9 +78,10 @@
                         <th class="pt-4 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b  border-x border-grey-light whitespace-nowrap text-center">
                             <span> {{ \Carbon\Carbon::create()->month($monthNo)->format('F') }} </span>
                             <div class="w-full flex justify-center items-center gap-0 mt-1 h-full">
-                                <div class="w-20 h-12 border-x border-t px-4 flex items-center justify-center">Target</div>
-                                <div class="w-20 h-12 border-x border-t px-4 flex items-center justify-center">Value</div>
-                                <div class="w-20 h-12 border-x border-t px-4 flex items-center justify-center">%</div>
+                                <div class="flex items-center justify-center w-20 h-12 border-x border-t px-4">Target</div>
+                                <div class="flex items-center justify-center w-20 h-12 border-x border-t px-4">Value</div>
+                                <div class="{{request('filter.analysis', 'percent') != 'percent' ? 'hidden' : 'flex'}} items-center justify-center w-20 h-12 border-x border-t px-4 value-col-percent">%</div>
+                                <div class="{{request('filter.analysis', 'percent') != 'variance' ? 'hidden' : 'flex'}} items-center justify-center w-20 h-12 border-x border-t px-4 value-col-variance">V</div>
                             </div>
                         </th>
                     @endforeach
@@ -101,6 +113,33 @@
             function submitForm() {
                 document.getElementById('search-form').submit()
             }
+
+            document.getElementById('toggle-variance').addEventListener('change', function(e) {
+                if (e.target.name === "filter[analysis]") {
+                    const show = e.target.value;
+                    // Percent columns
+                    document.querySelectorAll('.value-col-percent').forEach(el => {
+                        if (show === 'percent') {
+                            el.classList.remove('hidden');
+                            el.classList.add('flex');
+                        } else {
+                            el.classList.remove('flex');
+                            el.classList.add('hidden');
+                        }
+                    });
+                    // Variance columns
+                    document.querySelectorAll('.value-col-variance').forEach(el => {
+                        if (show === 'variance') {
+                            el.classList.remove('hidden');
+                            el.classList.add('flex');
+                        } else {
+                            el.classList.remove('flex');
+                            el.classList.add('hidden');
+                        }
+                    });
+                }
+            });
+
         </script>
     </x-slot:scripts>
 </x-app-layout>

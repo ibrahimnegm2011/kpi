@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\ClosedOption;
+use App\Enums\ReminderOption;
 use App\Enums\UserType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -163,6 +165,12 @@ return new class extends Migration
             $table->string('evidence_filepath')->nullable();
             $table->ulid('submitted_by')->nullable();
             $table->timestamp('submitted_at')->nullable();
+
+            $table->boolean('is_closed')->default(false);
+            $table->tinyInteger('auto_close_option')->nullable()->default(ClosedOption::MANUALLY());
+            $table->tinyInteger('auto_close_day')->nullable();
+            $table->tinyInteger('reminder_option')->nullable()->default(ReminderOption::BASIC());
+
             $table->ulid('created_by')->index();
             $table->timestamps();
         });

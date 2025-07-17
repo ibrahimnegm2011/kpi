@@ -3,10 +3,53 @@
         <div class="flex justify-between mb-5">
             <h1 class="text-3xl text-black"><i class="fas fa-bullseye mr-3"></i> Forecasts </h1>
             <div class="flex gap-3">
+                <div class="inline-flex">
+                    <form action="{{ route('account.forecasts.import') }}"
+                          method="POST" enctype="multipart/form-data" class="flex items-center m-0 p-0">
+                        @csrf
+                        <input
+                            id="import-file-input"
+                            type="file"
+                            name="import_file"
+                            accept=".xls,.xlsx"
+                            class="hidden"
+                            onchange="this.form.submit()"
+                        >
+                        <a type="button"
+                           onclick="document.getElementById('import-file-input').click();"
+                           class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 flex items-center rounded-l-md border border-gray-300 border-r border-r-gray-200">
+                            <i class="fas fa-upload mr-1"></i> Import
+                        </a>
+                        <a href="{{ route('account.forecasts.sample') }}"
+                           class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-3 px-2 flex items-center justify-center rounded-r-md border border-gray-300 border-l-0 leading-2">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </form>
+                </div>
+
+
                 <a class="bg-secondary-500 hover:bg-secondary-700 text-white font-bold py-2 px-4 rounded"
                    href="{{route('account.forecasts.create')}}">Add Forecast</a>
             </div>
         </div>
+
+        @if ($errors->any())
+            <div class="mb-4 rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-700 shadow-sm">
+                <div class="font-semibold mb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" stroke-width="2"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M12 9v2m0 4h.01m-.01-10a9 9 0 110 18 9 9 0 010-18z"/>
+                    </svg>
+                    Please fix the following errors:
+                </div>
+                <ul class="list-disc pl-6 space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <div class="bg-white mt-5 p-4">
             <form method="get" id="search-form">
@@ -81,6 +124,25 @@
                             Not Submitted
                         </button>
                         <input type="hidden" name="filter[submitted]" id="filterSubmitted" value="{{ request('filter.submitted') }}">
+                    </div>
+
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                        <button type="button"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.closed') === null || request('filter.closed') === '' ? 'bg-secondary-300 text-white' : '' }}"
+                                onclick="setClosed('')">
+                            All
+                        </button>
+                        <button type="button"
+                                class="px-4 py-2 border-t border-b border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.closed') === '1' ? 'bg-secondary-300 text-white' : '' }}"
+                                onclick="setClosed('1')">
+                            Closed
+                        </button>
+                        <button type="button"
+                                class="px-4 py-2 border border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus:z-10 focus:ring-2 focus:ring-secondary-600 {{ request('filter.closed') === '0' ? 'bg-secondary-300 text-white' : '' }}"
+                                onclick="setClosed('0')">
+                            Opened
+                        </button>
+                        <input type="hidden" name="filter[closed]" id="filterClosed" value="{{ request('filter.closed') }}">
                     </div>
                 </div>
 
@@ -166,6 +228,11 @@
 
             function setSubmitted(value) {
                 document.getElementById('filterSubmitted').value = value;
+                submitForm();
+            }
+
+            function setClosed(value) {
+                document.getElementById('filterClosed').value = value;
                 submitForm();
             }
 

@@ -30,11 +30,11 @@ class AuthenticatedSessionController extends Controller
             return 'This user is not active. Contact your administrator.';
         }
 
-        if($user->type == UserType::ACCOUNT && ! $user->account->is_active) {
+        if ($user->type == UserType::ACCOUNT && ! $user->account->is_active) {
             return 'Your account is not active. Contact your administrator.';
         }
 
-        if(
+        if (
             $user->type == UserType::AGENT &&
             ! $user->agent_assignments
                 ->pluck('account.is_active')->unique()

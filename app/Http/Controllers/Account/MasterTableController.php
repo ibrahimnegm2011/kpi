@@ -13,7 +13,7 @@ class MasterTableController extends Controller
     protected function filterForecasts()
     {
         $forecastsQ = Forecast::with(['kpi.category', 'department', 'company'])
-            ->whereHas('kpi', fn ($q)  => $q->active(true))
+            ->whereHas('kpi', fn ($q) => $q->active(true))
             ->where('account_id', auth()->user()->account_id)
             ->where('year', request('filter.year') ?? now()->year);
         if (request('filter.company')) {

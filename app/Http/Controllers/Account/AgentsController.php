@@ -35,6 +35,7 @@ class AgentsController extends Controller
                 ->where('type', UserType::AGENT())
                 ->withWhereHas('account_agent_assignments')
                 ->with('account_agent_assignments.company', 'account_agent_assignments.department')
+                ->latest()
                 ->paginate(10)->withQueryString(),
         ]);
     }
@@ -91,7 +92,7 @@ class AgentsController extends Controller
         $user = User::with('agent_assignments')
             ->where('email', $data['email'])->first();
 
-        if($user && $user->type != UserType::AGENT) {
+        if ($user && $user->type != UserType::AGENT) {
             return back()->withErrors(['email' => 'Email already exists in different type.'])->withInput();
         }
 
@@ -237,11 +238,11 @@ class AgentsController extends Controller
                 ->delete();
         }
 
-        //TODO: New email for updating the assignments
-//        Mail::to($user)->sendNow(new InviteAgent(
-//            user: $user,
-//            account: Account::find(Auth::user()->account_id),
-//        ));
+        // TODO: New email for updating the assignments
+        //        Mail::to($user)->sendNow(new InviteAgent(
+        //            user: $user,
+        //            account: Account::find(Auth::user()->account_id),
+        //        ));
 
         return true;
     }
