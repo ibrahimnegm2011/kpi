@@ -179,27 +179,27 @@
                         </div>
                     </div>
 
-                    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                        @php
-                            $reminderOptions = ReminderOption::cases();
-                            $reminderSelected = old('reminder_option', $forecast->reminder_option ?? ReminderOption::BASIC());
-                        @endphp
+{{--                    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">--}}
+{{--                        @php--}}
+{{--                            $reminderOptions = ReminderOption::cases();--}}
+{{--                            $reminderSelected = old('reminder_option', $forecast->reminder_option ?? ReminderOption::BASIC());--}}
+{{--                        @endphp--}}
 
-                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Reminder
-                            Option</label>
-                        <div x-data="{ reminderOption: '{{ $reminderSelected }}' }" class="mt-1 p-3 border rounded-md">
-                            <div class="flex flex-col space-y-2">
-                                @foreach($reminderOptions as $reminder)
-                                    <label class="inline-flex items-center">
-                                        <input type="radio" name="reminder_option" value="{{ $reminder->value }}"
-                                               @if($reminderSelected == $reminder->value) checked @endif
-                                               x-model="reminderOption">
-                                        <span class="ml-2">{{ $reminder->title() }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
+{{--                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Reminder--}}
+{{--                            Option</label>--}}
+{{--                        <div x-data="{ reminderOption: '{{ $reminderSelected }}' }" class="mt-1 p-3 border rounded-md">--}}
+{{--                            <div class="flex flex-col space-y-2">--}}
+{{--                                @foreach($reminderOptions as $reminder)--}}
+{{--                                    <label class="inline-flex items-center">--}}
+{{--                                        <input type="radio" name="reminder_option" value="{{ $reminder->value }}"--}}
+{{--                                               @if($reminderSelected == $reminder->value) checked @endif--}}
+{{--                                               x-model="reminderOption">--}}
+{{--                                        <span class="ml-2">{{ $reminder->title() }}</span>--}}
+{{--                                    </label>--}}
+{{--                                @endforeach--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
 
 
                 </div>

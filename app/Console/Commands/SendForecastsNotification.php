@@ -56,14 +56,12 @@ class SendForecastsNotification extends Command
                             'count'   => $count,
                         ];
                     }
-
                 }
 
                 if (!empty($accountsToNotify)) {
                     \Mail::to($user->email)
                         ->queue(new ForecastsNotification($user, $year, $month, $accountsToNotify));
                 }
-
             });
     }
 }
