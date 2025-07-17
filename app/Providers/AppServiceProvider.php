@@ -13,8 +13,6 @@ class AppServiceProvider extends ServiceProvider
     {
         if ($this->app->environment(['stage'])) {
             $this->app->usePublicPath(base_path().'/../public_html/kpi');
-        } elseif ($this->app->environment(['production'])) {
-            $this->app->usePublicPath(base_path().'/../public_html');
         }
     }
 
