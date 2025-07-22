@@ -91,7 +91,7 @@
                     </tr>
                 @endif
                 @foreach($users as $user)
-                    <tr class="hover:bg-gray-100 {{$user->is_admin ? 'bg-primary-50': ''}}" title="Admin User">
+                    <tr class="hover:bg-gray-100">
                         <td class="py-4 px-6 border-b border-grey-light">{{$loop->iteration}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$user->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$user->email}}</td>

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\Permission;
 use App\Enums\UserType;
 use App\Http\Controllers\Controller;
 use App\Mail\InviteAccountAdmin;
 use App\Models\Account;
+use App\Models\UserPermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -60,8 +62,14 @@ class AccountsController extends Controller
                     'email' => $data['contact_email'],
                     'type' => UserType::ACCOUNT(),
                 ]);
-
                 $account->update(['admin_user_id' => $user->id]);
+
+                foreach (Permission::accountPermissions() as $permission) {
+                    UserPermission::factory()->create([
+                        'user_id' => $user->id,
+                        'permission' => $permission,
+                    ]);
+                }
 
                 Mail::to($user)->sendNow(new InviteAccountAdmin($user));
             } catch (\Throwable $exception) {
