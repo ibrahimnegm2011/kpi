@@ -9,6 +9,7 @@ use App\Models\Forecast;
 use App\Models\Kpi;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
@@ -41,13 +42,12 @@ use Maatwebsite\Excel\Concerns\ToCollection;
             $data = [
                 'category' => trim($row[0] ?? ''),
                 'kpi' => trim($row[1] ?? ''),
-                'definition' => trim($row[2] ?? ''),
-                'year' => $row[3] ?? null,
-                'month' => trim($row[4] ?? ''),
-                'company' => trim($row[5] ?? ''),
-                'department' => trim($row[6] ?? ''),
-                'target' => $row[7] ?? null,
-                'value' => $row[8] ?? null,
+                'year' => $row[2] ?? null,
+                'month' => trim($row[3] ?? ''),
+                'company' => trim($row[4] ?? ''),
+                'department' => trim($row[5] ?? ''),
+                'target' => $row[6] ?? null,
+                'value' => $row[7] ?? null,
             ];
 
             // normalize date
@@ -67,7 +67,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
                 continue;
             }
             $data['kpi_id'] = $kpi->id;
-            unset($data['kpi'], $data['definition'], $data['category']);
+            unset($data['kpi'], $data['category']);
 
             // check company exists
             $data['company_id'] = $this->getCompaniesMap()[strtolower($data['company'])] ?? null;
@@ -143,6 +143,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
                 'year' => $parsedDate->year,
             ];
         } catch (\Exception $e) {
+            Log::error($e->getMessage(), [$month, $year]);
             return 'Invalid month or year format.';
         }
     }
