@@ -124,6 +124,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
                 continue;
             }
 
+            $data['account_id'] = auth()->user()->account_id;
             $this->validRows[] = $data;
         }
     }
