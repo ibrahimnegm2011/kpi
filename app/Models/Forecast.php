@@ -101,7 +101,7 @@ class Forecast extends Model
             return false;
         }
 
-        $date = Carbon::create()->month((int) $this->month)->year((int) $this->year)->day(1);
+        $date = Carbon::create()->month((int) $this->month + 1)->year((int) $this->year)->day(1);
         if($date->lessThan(now())) {
             return false;
         }

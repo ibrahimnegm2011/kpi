@@ -64,7 +64,7 @@ enum Menu: string
             'ADMIN_USERS' => 'Users',
 
             'AGENT_DASHBOARD' => 'Dashboard',
-            'AGENT_KPIS' => 'KPIs',
+            'AGENT_KPIS' => 'Upcoming KPIs',
             'AGENT_SUBMITTED_KPIS' => 'Done KPIs',
             'AGENT_OVERDUE_KPIS' => 'Overdue KPIs',
             default => Str::headline($this->value)

@@ -31,7 +31,6 @@ class DashboardController extends AgentController
             $data = Kpi::query()
                 ->where('is_active', true)
                 ->whereHas('forecasts', fn ($query) => $query
-                    ->where('is_submitted', true)
                     ->when($inputs['filter']['year'] ?? null, fn ($query, $year) => $query->where('year', $year))
                     ->when($inputs['filter']['months'] ?? null, fn ($query, $months) => $query->whereIn('month', $months))
                     ->when($inputs['filter']['department'] ?? null, fn ($query, $departmentId) => $query->where('department_id', $departmentId))
@@ -73,9 +72,9 @@ class DashboardController extends AgentController
 
         return response()->json([
             'name' => $data[0]->kpi->name,
-            'value' => $data->last()->value,
-            'goal' => $data->last()->target,
-            'percent' => round(($data->last()->value / $data->last()->target)  * 100,2),
+            'value' => $data->sum('value'),
+            'goal' => $data->sum('target'),
+            'percent' => round(($data->sum('value') / $data->sum('target'))  * 100,2),
             'months' => $data->pluck('month'),
             'targets' => $data->pluck('target'),
             'values' => $data->pluck('value'),
