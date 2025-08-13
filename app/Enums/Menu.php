@@ -54,6 +54,7 @@ enum Menu: string
     public function title()
     {
         return match ($this->name) {
+            'DASHBOARD' => 'Summary Dashboard',
             'MASTER_TABLE' => 'Performance Report',
             'KPIS' => 'KPI Definitions',
 
@@ -71,8 +72,6 @@ enum Menu: string
     public function route()
     {
         return match ($this->name) {
-            'DASHBOARD' => 'home',
-
             //            'AGENT_DASHBOARD' => 'agent.dashboard',
             'AGENT_KPIS' => 'agent.kpis',
             'AGENT_SUBMITTED_KPIS' => 'agent.submitted_kpis',
@@ -90,6 +89,7 @@ enum Menu: string
             'KPIS' => 'account.kpis.index',
             'FORECASTS' => 'account.forecasts.index',
             'MASTER_TABLE' => 'account.master.index',
+            'DASHBOARD' => 'account.dashboard',
 
             default => Route::has($this->value.'.index') ? $this->value.'.index' : 'home'
         };
@@ -160,7 +160,7 @@ enum Menu: string
     public static function accountItems()
     {
         return [
-            //            Menu::DASHBOARD,
+            Menu::DASHBOARD,
             Menu::MASTER_TABLE,
             Menu::FORECASTS,
             Menu::KPIS,

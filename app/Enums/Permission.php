@@ -42,6 +42,7 @@ enum Permission: string
             self::ADMIN_USERS => 'Users',
 
             self::MASTER_TABLE => 'Performance Report',
+            self::DASHBOARD => 'Summary Dashboard',
 
             default => Str::headline($this->value)
         };
@@ -58,7 +59,7 @@ enum Permission: string
     public static function accountPermissions()
     {
         return [
-            //            self::DASHBOARD,
+            self::DASHBOARD,
             self::MASTER_TABLE,
             self::FORECASTS,
             self::KPIS,

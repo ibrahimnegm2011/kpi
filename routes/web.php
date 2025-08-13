@@ -16,7 +16,7 @@ Route::middleware('auth')->group(function () {
         if (Auth::user()->type == UserType::ADMIN) {
             return redirect(route('admin.home'));
         } elseif (Auth::user()->type == UserType::ACCOUNT) {
-            return view('dashboard');
+            return redirect(route('account.dashboard'));
         } elseif (Auth::user()->type == UserType::AGENT) {
             return redirect(route('agent.home'));
         } else {

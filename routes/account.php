@@ -4,6 +4,7 @@ use App\Enums\Permission;
 use App\Http\Controllers\Account\AgentsController;
 use App\Http\Controllers\Account\CategoriesController;
 use App\Http\Controllers\Account\CompaniesController;
+use App\Http\Controllers\Account\DashboardController;
 use App\Http\Controllers\Account\DepartmentsController;
 use App\Http\Controllers\Account\ForecastsController;
 use App\Http\Controllers\Account\KpisController;
@@ -18,9 +19,9 @@ Route::name('account.')->namespace('App\Http\Controllers\Account')->group(functi
     });
 
     Route::middleware(['auth', 'iam:account'])->group(function () {
-        Route::get('/', function () {
-            return view('dashboard');
-        })->name('home');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/summary/chart', [DashboardController::class, 'chart'])->name('summary.chart')->middleware('can:'.Permission::DASHBOARD());
+
 
         Route::prefix('users')->name('users.')->controller(UsersController::class)->middleware('can:'.Permission::USERS())->group(function () {
             Route::get('/', 'index')->name('index');
