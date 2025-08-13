@@ -4,7 +4,8 @@
         <div class="w-full lg:w-1/4 space-y-4">
 
             {{-- Filter Card Style --}}
-            <form class="bg-white p-4 rounded shadow space-y-10" id="search-form">
+            <form class="bg-white p-4 rounded shadow space-y-10" id="search-form" method="post">
+                @csrf
                 <div>
                     <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Company</div>
                     <div class="bg-gray-100 text-sm p-3 rounded-b">

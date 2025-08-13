@@ -20,6 +20,7 @@ Route::name('account.')->namespace('App\Http\Controllers\Account')->group(functi
 
     Route::middleware(['auth', 'iam:account'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/summary/chart', [DashboardController::class, 'chart'])->name('summary.chart')->middleware('can:'.Permission::DASHBOARD());
 
 
