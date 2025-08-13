@@ -47,6 +47,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
                 'company' => trim($row[5] ?? ''),
                 'department' => trim($row[6] ?? ''),
                 'target' => $row[7] ?? null,
+                'value' => $row[8] ?? null,
             ];
 
             // normalize date
@@ -85,6 +86,12 @@ use Maatwebsite\Excel\Concerns\ToCollection;
                 continue;
             }
             unset($data['department']);
+
+            if($data['value']){
+                $data['is_submitted'] = true;
+                $data['submitted_at'] = now();
+                $data['submitted_by'] = auth()->id();
+            }
 
             $validator = Validator::make($data, [
                 'month' => 'required|integer|between:1,12',

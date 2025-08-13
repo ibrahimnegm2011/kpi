@@ -191,6 +191,7 @@ class ForecastsController extends Controller
                 'Company' => $companies[$i] ?? '',
                 'Department' => $departments[$i] ?? '',
                 'Target' => '',
+                'Value' => '',
             ]);
         }
 
@@ -206,7 +207,7 @@ class ForecastsController extends Controller
             public function headings(): array
             {
                 return [
-                    'Category', 'KPI', 'Year', 'Month', 'Company', 'Department', 'Target',
+                    'Category', 'KPI', 'Year', 'Month', 'Company', 'Department', 'Target', 'Value',
                 ];
             }
         }, 'forecasts-sample-'.date('YmdHis').'.xlsx');

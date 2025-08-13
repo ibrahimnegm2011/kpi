@@ -77,17 +77,23 @@ class DatabaseSeeder extends Seeder
 
         Kpi::factory()->create([
             'account_id' => $account->id, 'category_id' => $cat1->id, 'name' => 'Increase Number of Visits of Website',
-            'definition' => 'Increase Number of Visits of Website', 'equation' => 'Increase Number of Visits of Website',
+            'definition' => 'Increase Number of Visits of Website', 'equation' => '',
             'unit_of_measurement' => 'Number of Visits', 'symbol' => 'V',
         ]);
         Kpi::factory()->create([
             'account_id' => $account->id, 'category_id' => $cat2->id, 'name' => 'Increase Number of Projects',
-            'definition' => 'Increase Number of Projects', 'equation' => 'Increase Number of Projects',
+            'definition' => 'Increase Number of Projects', 'equation' => '',
             'unit_of_measurement' => 'Number of Projects', 'symbol' => 'P',
         ]);
         Kpi::factory()->create([
             'account_id' => $account->id, 'category_id' => $cat3->id, 'name' => 'Increase Sales of Projects',
-            'definition' => 'Increase Sales of Projects', 'equation' => 'Increase Sales of Projects',
+            'definition' => 'Increase Sales of Projects', 'equation' => '',
+            'unit_of_measurement' => 'Amount of Revenue', 'symbol' => 'SAR',
+        ]);
+
+        Kpi::factory()->create([
+            'account_id' => $account->id, 'category_id' => $cat1->id, 'name' => 'Number of Sites Upgrades',
+            'definition' => 'Increase Sales of Projects', 'equation' => '',
             'unit_of_measurement' => 'Amount of Revenue', 'symbol' => 'SAR',
         ]);
 
