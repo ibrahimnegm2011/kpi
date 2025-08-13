@@ -9,6 +9,7 @@ use App\Models\Forecast;
 use App\Models\Kpi;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\Importable;
@@ -124,7 +125,8 @@ use Maatwebsite\Excel\Concerns\ToCollection;
                 continue;
             }
 
-            $data['account_id'] = auth()->user()->account_id;
+            $data['account_id'] = Auth::user()->account_id;
+            $data['created_by'] = Auth::user()->id;
             $this->validRows[] = $data;
         }
     }
