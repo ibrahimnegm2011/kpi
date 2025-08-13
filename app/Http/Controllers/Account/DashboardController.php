@@ -37,8 +37,7 @@ class DashboardController extends Controller
                 ->where('account_id', $request->user()->account_id)
                 ->where('is_active', true)
                 ->whereHas('forecasts', fn ($query) => $query
-                    ->whereNotNull('submitted_at')
-                    ->where('is_closed', true)
+                    ->where('is_submitted', true)
                     ->when($inputs['filter']['year'] ?? null, fn ($query, $year) => $query->where('year', $year))
                     ->when($inputs['filter']['months'] ?? null, fn ($query, $months) => $query->whereIn('month', $months))
                     ->when($inputs['filter']['department'] ?? null, fn ($query, $departmentId) => $query->where('department_id', $departmentId))
@@ -64,7 +63,6 @@ class DashboardController extends Controller
 
         $data = Forecast::query()
             ->where('account_id', $request->user()->account_id)
-            ->where('is_closed', true)
             ->where('year', $inputs['year'])
             ->where('department_id', $inputs['department'])
             ->where('company_id', $inputs['company'])
