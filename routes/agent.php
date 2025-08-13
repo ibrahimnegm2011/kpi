@@ -14,6 +14,8 @@ Route::prefix('agent')->name('agent.')->namespace('App\Http\Controllers\Agent')-
 
     Route::middleware(['auth', 'iam:agent'])->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('home');
+        Route::get('/summary/chart', [DashboardController::class, 'chart'])->name('summary.chart');
+
 
         Route::post('account/select', AccountChangeController::class)->name('account.change');
 

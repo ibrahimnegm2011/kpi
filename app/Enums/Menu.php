@@ -44,9 +44,10 @@ enum Menu: string
 
             'ADMIN_ACCOUNTS' => '<i class="fas fa-sitemap mr-3"></i>',
 
-            'COMPANY_DASHBOARD' => '<i class="fas fa-chart-line mr-3"></i>',
-            'COMPANY_SUBMITTED_KPIS' => '<i class="fas fa-check-double mr-3"></i>',
-            'COMPANY_OVERDUE_KPIS' => '<i class="fas fa-hourglass-end mr-3"></i>',
+            'AGENT_DASHBOARD' => '<i class="fas fa-chart-line mr-3"></i>',
+            'AGENT_KPIS' => '<i class="fas fa-key mr-3"></i>',
+            'AGENT_SUBMITTED_KPIS' => '<i class="fas fa-check-double mr-3"></i>',
+            'AGENT_OVERDUE_KPIS' => '<i class="fas fa-hourglass-end mr-3"></i>',
             default => ''
         };
     }
@@ -62,6 +63,7 @@ enum Menu: string
             'ADMIN_ACCOUNTS' => 'Accounts',
             'ADMIN_USERS' => 'Users',
 
+            'AGENT_DASHBOARD' => 'Dashboard',
             'AGENT_KPIS' => 'KPIs',
             'AGENT_SUBMITTED_KPIS' => 'Done KPIs',
             'AGENT_OVERDUE_KPIS' => 'Overdue KPIs',
@@ -72,15 +74,6 @@ enum Menu: string
     public function route()
     {
         return match ($this->name) {
-            //            'AGENT_DASHBOARD' => 'agent.dashboard',
-            'AGENT_KPIS' => 'agent.kpis',
-            'AGENT_SUBMITTED_KPIS' => 'agent.submitted_kpis',
-            'AGENT_OVERDUE_KPIS' => 'agent.overdue_kpis',
-
-            'ADMIN_DASHBOARD' => 'admin.home',
-            'ADMIN_ACCOUNTS' => 'admin.accounts.index',
-            'ADMIN_USERS' => 'admin.users.index',
-
             'USERS' => 'account.users.index',
             'AGENTS' => 'account.agents.index',
             'COMPANIES' => 'account.companies.index',
@@ -90,6 +83,15 @@ enum Menu: string
             'FORECASTS' => 'account.forecasts.index',
             'MASTER_TABLE' => 'account.master.index',
             'DASHBOARD' => 'account.dashboard',
+
+            'ADMIN_DASHBOARD' => 'admin.home',
+            'ADMIN_ACCOUNTS' => 'admin.accounts.index',
+            'ADMIN_USERS' => 'admin.users.index',
+
+            'AGENT_DASHBOARD' => 'agent.home',
+            'AGENT_KPIS' => 'agent.kpis',
+            'AGENT_SUBMITTED_KPIS' => 'agent.submitted_kpis',
+            'AGENT_OVERDUE_KPIS' => 'agent.overdue_kpis',
 
             default => Route::has($this->value.'.index') ? $this->value.'.index' : 'home'
         };
@@ -141,7 +143,7 @@ enum Menu: string
     public static function agentItems()
     {
         return [
-            //            Menu::AGENT_DASHBOARD,
+            Menu::AGENT_DASHBOARD,
             Menu::AGENT_KPIS,
             Menu::AGENT_OVERDUE_KPIS,
             Menu::AGENT_SUBMITTED_KPIS,
