@@ -32,7 +32,7 @@ enum Menu: string
     public function icon()
     {
         return match ($this->name) {
-            'DASHBOARD' => '<i class="fa fa-chart-line mr-3"></i>',
+            'DASHBOARD' => '<i class="fa fa-chart-column mr-3"></i>',
             'MASTER_TABLE' => '<i class="fas fa-crosshairs mr-3"></i>',
             'FORECASTS' => '<i class="fas fa-bullseye mr-3"></i>',
             'KPIS', 'COMPANY_KPIS' => '<i class="fas fa-key mr-3"></i>',
@@ -44,7 +44,7 @@ enum Menu: string
 
             'ADMIN_ACCOUNTS' => '<i class="fas fa-sitemap mr-3"></i>',
 
-            'AGENT_DASHBOARD' => '<i class="fas fa-chart-line mr-3"></i>',
+            'AGENT_DASHBOARD' => '<i class="fas fa-chart-column mr-3"></i>',
             'AGENT_KPIS' => '<i class="fas fa-key mr-3"></i>',
             'AGENT_SUBMITTED_KPIS' => '<i class="fas fa-check-double mr-3"></i>',
             'AGENT_OVERDUE_KPIS' => '<i class="fas fa-hourglass-end mr-3"></i>',
