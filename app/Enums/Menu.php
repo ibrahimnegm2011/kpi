@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use App\Enums\Traits\EnumTrait;
+use App\Models\Forecast;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -64,9 +65,16 @@ enum Menu: string
             'ADMIN_USERS' => 'Users',
 
             'AGENT_DASHBOARD' => 'Dashboard',
-            'AGENT_KPIS' => 'Upcoming KPIs',
-            'AGENT_SUBMITTED_KPIS' => 'Done KPIs',
-            'AGENT_OVERDUE_KPIS' => 'Overdue KPIs',
+            'AGENT_KPIS' => 'Current KPIs <span class="ml-4 inline-flex min-w-[1.25rem] items-center justify-center rounded-full border border-current/30 bg-transparent px-2 py-0.5 text-xs leading-none">'
+                . Forecast::getCurrentCount() .
+                '</span>'
+        ,
+            'AGENT_SUBMITTED_KPIS' => 'Done KPIs <span class="ml-4 inline-flex min-w-[1.25rem] items-center justify-center rounded-full border border-current/30 bg-transparent px-2 py-0.5 text-xs leading-none">'
+                . Forecast::getDoneCount() .
+                '</span>',
+            'AGENT_OVERDUE_KPIS' => 'Overdue KPIs <span class="ml-4 inline-flex min-w-[1.25rem] items-center justify-center rounded-full border border-current/30 bg-transparent px-2 py-0.5 text-xs leading-none">'
+                . Forecast::getOverdueCount() .
+                '</span>',
             default => Str::headline($this->value)
         };
     }

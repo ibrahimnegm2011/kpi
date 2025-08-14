@@ -22,6 +22,48 @@ class Forecast extends Model
 
     protected $guarded = [];
 
+    public static function getCurrentCount()
+    {
+        return self::query()
+            ->whereHas('kpi', fn ($q) => $q->active(true))
+            ->where('is_submitted', false)
+            // All Current and Upcoming Forecasts
+            ->where(function($query) {
+                $query->where('year', '>', now()->year)
+                    ->orWhere(function($query) {
+                        $query->where('year', '=', now()->year)
+                            ->where('month', '>=', now()->subMonth()->month);
+                    });
+            })
+            ->forCurrentAgentAssignments()
+            ->count();
+    }
+
+    public static function getOverdueCount()
+    {
+        return self::query()
+            ->whereHas('kpi', fn ($q) => $q->active(true))
+            ->where('is_submitted', false)
+            ->where(function($query) {
+                $query->where('year', '<', now()->year)
+                    ->orWhere(function($query) {
+                        $query->where('year', '=', now()->year)
+                            ->where('month', '<', now()->subMonth()->month);
+                    });
+            })
+            ->forCurrentAgentAssignments()
+            ->count();
+    }
+
+    public static function getDoneCount()
+    {
+        return self::query()
+            ->whereHas('kpi', fn ($q) => $q->active(true))
+            ->where('is_submitted', true)
+            ->forCurrentAgentAssignments()
+            ->count();
+    }
+
     public function casts()
     {
         return [
@@ -101,10 +143,10 @@ class Forecast extends Model
             return false;
         }
 
-//        $date = Carbon::create()->month((int) $this->month + 1)->year((int) $this->year)->day(1);
-//        if($date->lessThan(now())) {
-//            return false;
-//        }
+        $date = Carbon::create()->month((int) $this->month + 1)->year((int) $this->year)->day(1);
+        if($date->isFuture()) {
+            return false;
+        }
         return true;
     }
 }

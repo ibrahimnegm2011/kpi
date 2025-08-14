@@ -50,9 +50,6 @@
                 <thead>
                 <tr>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                        #
-                    </th>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                         Kpi
                     </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
@@ -83,7 +80,6 @@
                 @endif
                 @foreach($forecasts as $forecast)
                     <tr class="hover:bg-gray-100">
-                        <td class="py-4 px-6 border-b border-grey-light">{{$loop->iteration}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->category->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->company->name}} - {{$forecast->department->name}}</td>

@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="w-full mt-1">
         <div class="flex justify-between mb-5">
-            <h1 class="text-3xl text-black"><i class="fas fa-key mr-3"></i> KPIs </h1>
+            <h1 class="text-3xl text-black"><i class="fas fa-key mr-3"></i> Current & Upcoming KPIs </h1>
         </div>
 
         <div class="bg-white mt-5 p-4">

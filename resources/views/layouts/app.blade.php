@@ -26,7 +26,7 @@
                 <a href="{{route($item->route())}}"
                    class="flex items-center text-white opacity-75 hover:opacity-100 py-4 pl-6 nav-item {{$item->isActive() ? 'bg-primary-600' : ''}}">
                     {!! $item->icon() !!}
-                    {{$item->title()}}
+                    {!! $item->title() !!}
                 </a>
             @endif
         @endforeach
@@ -135,7 +135,7 @@
                     <a href="{{route($menu->route())}}"
                        class="flex items-center text-white opacity-75 hover:opacity-100 py-4 pl-6 nav-item {{str_starts_with(request()->route()->getName(), $menu->route()) ? 'active-nav-link' : ''}}">
                         {!! $menu->icon() !!}
-                        {{$menu->title()}}
+                        {!! $menu->title() !!}
                     </a>
                 @endif
             @endforeach
