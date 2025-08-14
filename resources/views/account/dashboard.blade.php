@@ -1,125 +1,129 @@
 <x-app-layout>
-    <div class="flex flex-col lg:flex-row p-4 space-y-4 lg:space-y-0 lg:space-x-6">
-        {{-- Left Sidebar Filters --}}
-        <div class="w-full lg:w-1/4 space-y-4">
+        <div class="flex justify-between ml-4 mb-2">
+            <h1 class="text-3xl text-black font-semibold"><i class="fas fa-chart-column mr-3"></i> Summary Dashboard </h1>
+        </div>
+        <div class="flex flex-col lg:flex-row p-4 space-y-4 lg:space-y-0 lg:space-x-6">
 
-            {{-- Filter Card Style --}}
-            <form class="bg-white p-4 rounded shadow space-y-10" id="search-form" method="post">
-                @csrf
-                <div>
-                    <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Company</div>
-                    <div class="bg-gray-100 text-sm p-3 rounded-b">
-                        <select class="w-full border border-primary-700" name="filter[company]">
-                            <option value="" disabled {{!request('filter.company') ? 'selected': ''}}>Select Company</option>
-                            @foreach(\App\Models\Company::forAccount() as $company)
-                                <option value="{{$company->id}}" {{request('filter.company') == $company->id ? 'selected': ''}}>{{$company->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
+            {{-- Left Sidebar Filters --}}
+            <div class="w-full lg:w-1/4 space-y-4">
 
-                <div>
-                    <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Department</div>
-                    <div class="bg-gray-100 text-sm p-3 rounded-b">
-                        <select class="w-full border border-primary-700" name="filter[department]">
-                            <option value="" disabled {{!request('filter.department') ? 'selected': ''}}>Select Department</option>
-                            @foreach(\App\Models\Department::forAccount() as $department)
-                                <option value="{{$department->id}}" {{request('filter.department') == $department->id ? 'selected': ''}}>{{$department->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Year</div>
-                    <div class="bg-gray-100 text-sm p-3 rounded-b">
-                        <select class="w-full border border-primary-700" name="filter[year]">
-                            @php
-                                $minYear = \App\Models\Forecast::min('year') ?? date('Y');
-                                $maxYear = \App\Models\Forecast::max('year') ?? date('Y');
-                            @endphp
-                            @if(isset($minYear) && isset($maxYear))
-                                @for($year = $minYear; $year <= $maxYear; $year++)
-                                    <option value="{{ $year }}" {{ request('filter.year', now()->year) == $year ? 'selected' : '' }}>
-                                        {{ $year }}
-                                    </option>
-                                @endfor
-                            @endif
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Month</div>
-                    <div class="bg-gray-100 text-sm p-3 rounded-b">
-                        @php
-                            $preselected = array_map('intval', request('filter.months', []));
-                            $monthNames = [];
-                            foreach (range(1, 12) as $m) {
-                                $monthNames[$m] = \Carbon\Carbon::create()->month($m)->format('F');
-                            }
-                        @endphp
-
-                        <div
-                            x-data="monthMultiSelect({
-                                initial: @js($preselected),
-                                names: @js($monthNames)
-                            })"
-                            class="relative"
-                        >
-                            <!-- Trigger -->
-                            <button
-                                type="button"
-                                class="w-full border border-primary-700 bg-white rounded px-3 py-2 text-left flex items-center justify-between"
-                                @click="openMenu()"
-                                @keydown.escape.prevent.stop="closeAndSubmitIfChanged()"
-                            >
-                                <span x-text="label()"></span>
-                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </button>
-
-                            <!-- Dropdown -->
-                            <div
-                                x-show="open"
-                                @click.away="closeAndSubmitIfChanged()"
-                                class="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded shadow"
-                                style="display: none;"
-                            >
-                                <div class="max-h-60 overflow-auto py-2">
-                                    @foreach($monthNames as $num => $name)
-                                        <label class="flex items-center gap-2 px-3 py-1 hover:bg-gray-50 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                                                value="{{ $num }}"
-                                                :checked="draft.indexOf({{ $num }}) > -1"
-                                                @change="toggle({{ $num }})"
-                                            >
-                                            <span>{{ $name }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                                <div class="flex items-center justify-between border-t px-3 py-2 text-xs text-gray-600">
-                                    <button type="button" class="hover:underline" @click="selectAll()">Select all</button>
-                                    <button type="button" class="hover:underline" @click="clearAll()">Clear</button>
-                                    <button type="button" class="text-primary-700 font-semibold" @click="closeAndSubmitIfChanged()">Done</button>
-                                </div>
-                            </div>
-
-                            <!-- Hidden inputs (only enabled for selected months) -->
-                            @for($i = 1; $i <= 12; $i++)
-                                <input type="hidden" name="filter[months][]" value="{{ $i }}" :disabled="selected.indexOf({{ $i }}) === -1">
-                            @endfor
+                {{-- Filter Card Style --}}
+                <form class="p-4 rounded space-y-10" id="search-form" method="post">
+                    @csrf
+                    <div>
+                        <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Company</div>
+                        <div class="bg-primary-50 text-sm p-3 rounded-b">
+                            <select class="w-full border border-primary-700" name="filter[company]">
+                                <option value="" disabled {{!request('filter.company') ? 'selected': ''}}>Select Company</option>
+                                @foreach(\App\Models\Company::forAccount() as $company)
+                                    <option value="{{$company->id}}" {{request('filter.company') == $company->id ? 'selected': ''}}>{{$company->name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                </div>
-            </form>
-        </div>
 
-        {{-- Right KPI Panels --}}
-        <div class="w-full lg:w-3/4 space-y-6">
+                    <div>
+                        <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Department</div>
+                        <div class="bg-primary-50 text-sm p-3 rounded-b">
+                            <select class="w-full border border-primary-700" name="filter[department]">
+                                <option value="" disabled {{!request('filter.department') ? 'selected': ''}}>Select Department</option>
+                                @foreach(\App\Models\Department::forAccount() as $department)
+                                    <option value="{{$department->id}}" {{request('filter.department') == $department->id ? 'selected': ''}}>{{$department->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Year</div>
+                        <div class="bg-primary-50 text-sm p-3 rounded-b">
+                            <select class="w-full border border-primary-700" name="filter[year]">
+                                @php
+                                    $minYear = \App\Models\Forecast::min('year') ?? date('Y');
+                                    $maxYear = \App\Models\Forecast::max('year') ?? date('Y');
+                                @endphp
+                                @if(isset($minYear) && isset($maxYear))
+                                    @for($year = $minYear; $year <= $maxYear; $year++)
+                                        <option value="{{ $year }}" {{ request('filter.year', now()->year) == $year ? 'selected' : '' }}>
+                                            {{ $year }}
+                                        </option>
+                                    @endfor
+                                @endif
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Month</div>
+                        <div class="bg-primary-50 text-sm p-3 rounded-b">
+                            @php
+                                $preselected = array_map('intval', request('filter.months', []));
+                                $monthNames = [];
+                                foreach (range(1, 12) as $m) {
+                                    $monthNames[$m] = \Carbon\Carbon::create()->month($m)->format('F');
+                                }
+                            @endphp
+
+                            <div
+                                x-data="monthMultiSelect({
+                                    initial: @js($preselected),
+                                    names: @js($monthNames)
+                                })"
+                                class="relative"
+                            >
+                                <!-- Trigger -->
+                                <button
+                                    type="button"
+                                    class="w-full border border-primary-700 bg-white rounded px-3 py-2 text-left flex items-center justify-between"
+                                    @click="openMenu()"
+                                    @keydown.escape.prevent.stop="closeAndSubmitIfChanged()"
+                                >
+                                    <span x-text="label()"></span>
+                                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Dropdown -->
+                                <div
+                                    x-show="open"
+                                    @click.away="closeAndSubmitIfChanged()"
+                                    class="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded shadow"
+                                    style="display: none;"
+                                >
+                                    <div class="max-h-60 overflow-auto py-2">
+                                        @foreach($monthNames as $num => $name)
+                                            <label class="flex items-center gap-2 px-3 py-1 hover:bg-gray-50 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                                    value="{{ $num }}"
+                                                    :checked="draft.indexOf({{ $num }}) > -1"
+                                                    @change="toggle({{ $num }})"
+                                                >
+                                                <span>{{ $name }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                    <div class="flex items-center justify-between border-t px-3 py-2 text-xs text-gray-600">
+                                        <button type="button" class="hover:underline" @click="selectAll()">Select all</button>
+                                        <button type="button" class="hover:underline" @click="clearAll()">Clear</button>
+                                        <button type="button" class="text-primary-700 font-semibold" @click="closeAndSubmitIfChanged()">Done</button>
+                                    </div>
+                                </div>
+
+                                <!-- Hidden inputs (only enabled for selected months) -->
+                                @for($i = 1; $i <= 12; $i++)
+                                    <input type="hidden" name="filter[months][]" value="{{ $i }}" :disabled="selected.indexOf({{ $i }}) === -1">
+                                @endfor
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            {{-- Right KPI Panels --}}
+            <div class="w-full lg:w-3/4 space-y-6">
             @forelse($data as $category => $kpis)
                 @php
                     $defaultKpiId = optional($kpis->first())->id;
@@ -130,8 +134,8 @@
                         'months' => array_map('intval', request('filter.months', [])),
                     ];
                 @endphp
-                <div class="bg-white rounded shadow p-4 relative kpi-card" data-initial-kpi-id="{{ $defaultKpiId }}">
-                    <h2 class="text-lg font-semibold ml-2 pt-1">{{ $category }}</h2>
+                <div class="bg-gradient-to-b from-transparent to-primary-50 rounded shadow p-4 relative kpi-card" data-initial-kpi-id="{{ $defaultKpiId }}">
+                    <h2 class="text-lg font-semibold ml-2 pt-1 -mb-2">{{ $category }}</h2>
 
                     <div class="absolute top-4 right-4">
                         <select class="border border-primary-700 kpi-select">
@@ -152,7 +156,12 @@
 
                                 <div class="flex items-center justify-center text-4xl font-bold mx-4 kpi-value-wrap">
                                     <span class="kpi-value">—</span>
-                                    <span class="ml-2 text-xl kpi-alert" style="display:none;">!</span>
+                                    <span class="ml-5 mt-1 text-sm kpi-alert" style="display:none;">
+                                        <span class="fa-stack fa-1x" aria-label="Important">
+                                            <i class="fa-regular fa-circle fa-stack-2x"></i>   <!-- outline ring -->
+                                            <i class="fa-solid fa-exclamation fa-stack-1x"></i> <!-- exclamation -->
+                                        </span>
+                                    </span>
                                 </div>
                                 <div class="text-sm text-gray-600 mx-4">
                                     Goal: <span class="kpi-goal">—</span>
@@ -166,7 +175,7 @@
                         </div>
 
                         <div class="col-span-3 self-center">
-                            <div class="bg-gray-50 rounded flex items-center justify-center w-full" style="height: 10rem;">
+                            <div class="bg-transparent rounded flex items-center justify-center w-full" style="height: 10rem;">
                                 <canvas class="kpi-chart w-full h-full"></canvas>
                             </div>
                         </div>
@@ -182,11 +191,53 @@
                 </h2>
             @endforelse
         </div>
-    </div>
-
+        </div>
     @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js" crossorigin="anonymous"></script>
+
         <script>
+
+            const dottedYGrid = {
+                id: 'dottedYGrid',
+                beforeDatasetsDraw(chart, args, opts) {
+                    const { ctx, chartArea, scales } = chart;
+                    if (!chartArea) return;
+                    const yScale = scales.y;
+                    if (!yScale) return;
+
+                    const {
+                        dash = [8, 6],
+                        dashOffset = 0,
+                        color = 'rgba(0,0,0,0.35)',
+                        lineWidth = 1,
+                    } = opts || {};
+
+                    // No horizontal offset: use full chart area
+                    const xLeft = chartArea.left;
+                    const xRight = chartArea.right;
+
+                    ctx.save();
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = lineWidth;
+                    ctx.setLineDash(dash);
+                    ctx.lineDashOffset = dashOffset;
+
+                    yScale.ticks.forEach((_, i) => {
+                        const y = Math.round(yScale.getPixelForTick(i)) + 0.5;
+
+                        if (y >= chartArea.bottom) return;
+
+                        ctx.beginPath();
+                        ctx.moveTo(xLeft, y);
+                        ctx.lineTo(xRight, y);
+                        ctx.stroke();
+                    });
+
+                    ctx.setLineDash([]);
+                    ctx.lineDashOffset = 0;
+                    ctx.restore();
+                }
+            };
             // Alpine v2 view-only component
             function monthMultiSelect(config) {
                 const toNumberArray = (arr) => (Array.isArray(arr) ? arr.map(n => Number(n)) : []);
@@ -365,29 +416,49 @@
                                             {
                                                 label: 'Target',
                                                 data: T,
-                                                backgroundColor: 'rgba(59, 130, 246, 0.45)',
-                                                borderColor: 'rgba(59, 130, 246, 1)',
+                                                backgroundColor: '#62C2E1',
+                                                borderColor: '#62C2E1',
                                                 borderWidth: 1
                                             },
                                             {
                                                 label: 'Value',
                                                 data: V,
-                                                backgroundColor: 'rgba(124, 58, 237, 0.45)',
-                                                borderColor: 'rgba(124, 58, 237, 1)',
+                                                backgroundColor: '#5CA082',
+                                                borderColor: '#5CA082',
                                                 borderWidth: 1
                                             }
                                         ]
                                     },
+                                    plugins: [dottedYGrid],
                                     options: {
                                         responsive: true,
                                         maintainAspectRatio: false,
                                         plugins: {
                                             legend: { position: 'bottom' },
-                                            tooltip: { mode: 'index', intersect: false }
+                                            tooltip: { mode: 'index', intersect: false },
+                                            dottedYGrid: {
+                                                dash: [8, 6],
+                                                dashOffset: 0,
+                                                skipBottomLine: false,
+                                                color: 'rgba(0,0,0,0.30)',
+                                                lineWidth: 1
+                                            }
                                         },
                                         scales: {
-                                            x: { stacked: false, ticks: { autoSkip: false, maxRotation: 0 } },
-                                            y: { beginAtZero: true }
+                                            x: {
+                                                stacked: false,
+                                                ticks: { autoSkip: false, maxRotation: 0 },
+                                                grid: {drawBorder: false, drawTicks: false}
+                                            },
+                                            y: {
+                                                suggestedMax: 100,
+                                                grid: {
+                                                    drawOnChartArea: false, // hide default solid grid
+                                                    drawBorder: false,
+                                                    drawTicks: false
+                                                },
+                                                ticks: { beginAtZero: true }
+                                            }
                                         }
                                     }
                                 });
@@ -408,7 +479,6 @@
                             };
                             var qs = $.param(params, true);
                             var months = Array.isArray(filters.months) ? filters.months : [];
-                            console.log(filters, months);
                             months.forEach(function (m) {
                                 qs += '&' + encodeURIComponent('months[]') + '=' + encodeURIComponent(Number(m));
                             });

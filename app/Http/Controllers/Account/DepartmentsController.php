@@ -44,6 +44,7 @@ class DepartmentsController extends Controller
                 Rule::unique('departments', 'name')
                     ->where('account_id', Auth::user()->account_id),
             ],
+            'description' => ['nullable', 'string'],
         ]);
 
         $data['account_id'] = Auth::user()->account_id;
@@ -61,7 +62,8 @@ class DepartmentsController extends Controller
                 'required', 'string',
                 Rule::unique('departments', 'name')->ignoreModel($department)
                     ->where('account_id', Auth::user()->account_id),
-            ],            'description' => ['nullable', 'string'],
+            ],
+            'description' => ['nullable', 'string'],
         ]);
 
         $department->update($data);
