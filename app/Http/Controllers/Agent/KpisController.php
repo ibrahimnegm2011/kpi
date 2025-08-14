@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Matrix\Builder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -22,9 +23,17 @@ class KpisController extends AgentController
             ])
                 ->whereHas('kpi', fn ($q) => $q->active(true))
                 ->where('is_submitted', false)
-                ->where('year', '>=', now()->year)
-                ->where('month', '>=', now()->subMonth()->month)
+                // All Current and Upcoming Forecasts
+                ->where(function($query) {
+                    $query->where('year', '>', now()->year)
+                        ->orWhere(function($query) {
+                            $query->where('year', '=', now()->year)
+                                ->where('month', '>=', now()->subMonth()->month);
+                        });
+                })
                 ->forCurrentAgentAssignments()
+                ->orderBy('year')
+                ->orderBy('month')
                 ->latest()
                 ->paginate(10)->withQueryString(),
         ]);
@@ -40,9 +49,16 @@ class KpisController extends AgentController
             ])
                 ->whereHas('kpi', fn ($q) => $q->active(true))
                 ->where('is_submitted', false)
-                ->where('year', '<=', now()->year)
-                ->where('month', '<', now()->subMonth()->month)
+                ->where(function($query) {
+                    $query->where('year', '<', now()->year)
+                        ->orWhere(function($query) {
+                            $query->where('year', '=', now()->year)
+                                ->where('month', '<', now()->subMonth()->month);
+                        });
+                })
                 ->forCurrentAgentAssignments()
+                ->orderBy('year')
+                ->orderBy('month')
                 ->latest()
                 ->paginate(10)->withQueryString(),
         ]);
@@ -59,6 +75,8 @@ class KpisController extends AgentController
                 ->whereHas('kpi', fn ($q) => $q->active(true))
                 ->where('is_submitted', true)
                 ->forCurrentAgentAssignments()
+                ->orderBy('year', 'desc')
+                ->orderBy('month', 'desc')
                 ->latest()
                 ->paginate(10)->withQueryString(),
         ]);
