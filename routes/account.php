@@ -93,6 +93,8 @@ Route::name('account.')->namespace('App\Http\Controllers\Account')->group(functi
 
             Route::get('/sample', 'sample')->name('sample');
             Route::post('/import', 'import')->name('import');
+
+            Route::post('/bulk', 'bulk_action')->name('bulk');
         });
         Route::get('/forecasts/{forecast}/download', [ForecastsController::class, 'downloadEvidence'])->name('forecasts.download');
 
