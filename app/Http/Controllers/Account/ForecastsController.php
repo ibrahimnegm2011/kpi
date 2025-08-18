@@ -10,7 +10,6 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Models\Forecast;
 use App\Models\Kpi;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -42,9 +41,11 @@ class ForecastsController extends Controller
                 ->where('account_id', Auth::user()->account_id)
                 ->whereHas('kpi', fn ($q) => $q->active(true))
                 ->orderBy('is_closed')
+                ->orderByDesc('year')
+                ->orderByDesc('month')
                 ->orderByDesc('created_at')
                 ->latest()
-                ->paginate(10)->withQueryString(),
+                ->paginate(50)->withQueryString(),
         ]);
     }
 
@@ -143,6 +144,29 @@ class ForecastsController extends Controller
         $forecast->update(Arr::except($data, ['category_id']));
 
         return redirect(route('account.forecasts.index'))->with(['success' => 'Forecast has been updated successfully']);
+    }
+
+    public function bulk_action(Request $request)
+    {
+        $data = $request->validate([
+            'action' => ['required', Rule::in(['close', 'open'])],
+            'ids' => ['required', 'array'],
+            'ids.*' => ['required', Rule::exists('forecasts', 'id')->where('account_id', Auth::user()->account_id)],
+        ]);
+
+        $forecastsQ = Forecast::whereIn('id', $data['ids'])
+            ->when($data['action'] == 'close', fn ($q) => $q->where('is_closed', false))
+            ->when($data['action'] == 'open', fn ($q) => $q->where('is_closed', true));
+
+        $count = $forecastsQ->count();
+
+        if(!$count){
+            return redirect(route('account.forecasts.index'))->with(['error' => "No forecasts found to be {$data['action']}ed."]);
+        }
+
+        $forecastsQ->update(['is_closed' => $data['action'] == 'close']);
+
+        return redirect(route('account.forecasts.index'))->with(['success' => "{$count} forecasts have been {$data['action']}ed successfully."]);
     }
 
     public function delete(Forecast $forecast)

@@ -451,7 +451,6 @@
                                                 grid: {drawBorder: false, drawTicks: false}
                                             },
                                             y: {
-                                                suggestedMax: 100,
                                                 grid: {
                                                     drawOnChartArea: false, // hide default solid grid
                                                     drawBorder: false,

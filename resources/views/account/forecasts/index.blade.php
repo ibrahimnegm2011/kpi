@@ -105,7 +105,6 @@
                     </select>
                 </div>
 
-
                 <div class="flex gap-3 mt-5">
                     <div class="inline-flex rounded-md shadow-sm" role="group">
                         <button type="button"
@@ -149,45 +148,78 @@
                 <input type="submit" style="display:none"/>
             </form>
         </div>
+
+        <div class="bg-white -mt-14 px-4 flex items-center justify-end gap-3">
+            <form id="bulk-form" method="POST" action="{{ route('account.forecasts.bulk') }}" class="flex items-center gap-2">
+                @csrf
+                <input type="hidden" name="action" id="bulk-action" value="">
+                <span id="selected-count" class="text-sm text-gray-600"></span>
+
+                <button type="button"
+                        id="btn-close-selected"
+                        class="px-4 py-2 bg-primary-500 text-white font-bold rounded disabled:bg-primary-200 disabled:cursor-not-allowed"
+                        disabled
+                        onclick="submitBulk('open')">
+                    Open Selected
+                </button>
+                <button type="button"
+                        id="btn-open-selected"
+                        class="px-4 py-2 bg-secondary-500 text-white rounded disabled:bg-secondary-200 disabled:cursor-not-allowed"
+                        disabled
+                        onclick="submitBulk('close')">
+                    Close Selected
+                </button>
+            </form>
+        </div>
+
         <div class="bg-white overflow-auto">
-            <table class="w-full border-collapse text-left">
+            <table class="w-full border-collapse text-left text-sm">
                 <thead>
                 <tr>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-grey-dark border-b border-grey-light w-10">
+                        <input type="checkbox" id="select-all" class="text-secondary-500" />
+                    </th>
+                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-grey-dark border-b border-grey-light">
                         KPI
                     </th>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-grey-dark border-b border-grey-light">
                         Month
                     </th>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                        Category
-                    </th>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-grey-dark border-b border-grey-light">
                         Department
                     </th>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-grey-dark border-b border-grey-light">
+                        Status
+                    </th>
+                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-grey-dark border-b border-grey-light">
                         Target
                     </th>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                        Value
+                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-grey-dark border-b border-grey-light">
+                        Submitted Value
                     </th>
-                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light"></th>
+                    <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-grey-dark border-b border-grey-light"></th>
                 </tr>
                 </thead>
                 <tbody>
                 @forelse($forecasts as $forecast)
                     <tr class="hover:bg-gray-100">
+                        <td class="py-4 px-6 border-b border-grey-light align-top">
+                            <input type="checkbox"
+                                   class="row-checkbox text-secondary-500"
+                                   value="{{$forecast->id}}"
+                                   onchange="onRowCheckboxChange(this)">
+                        </td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{\Carbon\Carbon::create()->month($forecast->month)->year($forecast->year)->format('F, Y')}}</td>
-                        <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->category->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->company->name}} <br/> {{$forecast->department->name}}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">{{$forecast->is_closed ? 'Closed' : 'Opened'}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->target}}</td>
                         <td class="py-4 px-6 border-b border-grey-light" title="{{$forecast->submitted_at}}">{{$forecast->is_submitted ? $forecast->value : '-'}}</td>
 
                         <td class="py-4 px-6 border-b border-grey-light ">
-                            <a class="mx-1 text-secondary-500 hover:text-primary-500" href="{{route('account.forecasts.view', $forecast->id)}}"> <i class="fas fa-eye"></i> </a>
+                            <a class="text-secondary-500 hover:text-primary-500" href="{{route('account.forecasts.view', $forecast->id)}}"> <i class="fas fa-eye"></i> </a>
                             @if(!$forecast->is_submitted)
-                                <a class="mx-1 text-secondary-500 hover:text-primary-500" href="{{route('account.forecasts.edit', $forecast->id)}}"> <i class="fas fa-edit"></i> </a>
+                                <a class="text-secondary-500 hover:text-primary-500" href="{{route('account.forecasts.edit', $forecast->id)}}"> <i class="fas fa-edit"></i> </a>
                                 <form method="POST" action="{{ route('account.forecasts.delete', $forecast) }}" style="display:inline;"
                                       onsubmit="return confirmDelete('{{ addslashes($forecast->title) }}')">
                                     @csrf
@@ -200,7 +232,7 @@
                                 </form>
                             @else
                                 @if($forecast->evidence_filepath)
-                                    <a class="mx-1 text-secondary-500 hover:text-primary-500" href="{{route('account.forecasts.download', $forecast)}}" target="_blank">
+                                    <a class="text-secondary-500 hover:text-primary-500" href="{{route('account.forecasts.download', $forecast)}}" target="_blank">
                                         <i class="fas fa-file-download"></i>
                                     </a>
                                 @endif
@@ -239,6 +271,71 @@
             function confirmDelete(forecastTitle) {
                 return confirm(`Are you sure you want to delete forecast "${forecastTitle}"? This action cannot be undone.`);
             }
+
+            const selectAllEl = document.getElementById('select-all');
+            const bulkForm = document.getElementById('bulk-form');
+            const selectedCountEl = document.getElementById('selected-count');
+            const btnClose = document.getElementById('btn-close-selected');
+            const btnOpen = document.getElementById('btn-open-selected');
+
+            function updateBulkState() {
+                const checkboxes = document.querySelectorAll('.row-checkbox');
+                const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+
+                // Clear existing hidden inputs
+                Array.from(bulkForm.querySelectorAll('input[name="ids[]"]')).forEach(el => el.remove());
+
+                // Append selected as hidden inputs
+                selected.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids[]';
+                    input.value = id;
+                    bulkForm.appendChild(input);
+                });
+
+                // Update Select All state
+                if (checkboxes.length > 0) {
+                    const allChecked = selected.length === checkboxes.length;
+                    selectAllEl.checked = allChecked;
+                    selectAllEl.indeterminate = selected.length > 0 && !allChecked;
+                } else {
+                    selectAllEl.checked = false;
+                    selectAllEl.indeterminate = false;
+                }
+
+                // Enable/disable buttons and show count
+                const hasSelection = selected.length > 0;
+                btnClose.disabled = !hasSelection;
+                btnOpen.disabled = !hasSelection;
+                selectedCountEl.textContent = hasSelection ? `${selected.length} selected` : '';
+            }
+
+            function onRowCheckboxChange() {
+                updateBulkState();
+            }
+
+            if (selectAllEl) {
+                selectAllEl.addEventListener('change', function () {
+                    const checkboxes = document.querySelectorAll('.row-checkbox');
+                    checkboxes.forEach(cb => cb.checked = selectAllEl.checked);
+                    updateBulkState();
+                });
+            }
+
+            function submitBulk(action) {
+                const existing = bulkForm.querySelector('#bulk-action');
+                existing.value = action; // 'close' or 'open'
+                const hasIds = bulkForm.querySelector('input[name="ids[]"]') !== null;
+                if (!hasIds) {
+                    alert('Please select at least one forecast.');
+                    return;
+                }
+                bulkForm.submit();
+            }
+
+            // Initialize state on page load (in case of persisted pagination)
+            updateBulkState();
         </script>
     </x-slot:scripts>
 </x-app-layout>
