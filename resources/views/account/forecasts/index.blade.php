@@ -152,6 +152,7 @@
         <div class="bg-white -mt-14 px-4 flex items-center justify-end gap-3">
             <form id="bulk-form" method="POST" action="{{ route('account.forecasts.bulk') }}" class="flex items-center gap-2">
                 @csrf
+                <input type="hidden" name="redirect" value="{{ url()->full() }}">
                 <input type="hidden" name="action" id="bulk-action" value="">
                 <span id="selected-count" class="text-sm text-gray-600"></span>
 
