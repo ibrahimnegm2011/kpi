@@ -414,19 +414,19 @@
                                         labels: L,
                                         datasets: [
                                             {
+                                                label: 'Actual',
+                                                data: V,
+                                                backgroundColor: '#5CA082',
+                                                borderColor: '#5CA082',
+                                                borderWidth: 1
+                                            },
+                                            {
                                                 label: 'Target',
                                                 data: T,
                                                 backgroundColor: '#62C2E1',
                                                 borderColor: '#62C2E1',
                                                 borderWidth: 1
                                             },
-                                            {
-                                                label: 'Value',
-                                                data: V,
-                                                backgroundColor: '#5CA082',
-                                                borderColor: '#5CA082',
-                                                borderWidth: 1
-                                            }
                                         ]
                                     },
                                     plugins: [dottedYGrid],

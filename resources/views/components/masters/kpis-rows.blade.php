@@ -17,10 +17,10 @@
                 @if($forecast)
                     <div class="flex justify-center items-center gap-0 h-full">
                         <div class="w-20 h-full border-x px-4 flex items-center justify-center">
-                            {{ $target }}
+                            {{ $value }}
                         </div>
                         <div class="w-20 h-full border-x px-4 flex items-center justify-center">
-                            {{ $value }}
+                            {{ $target }}
                         </div>
                         <div class="{{request('filter.analysis', 'percent') != 'percent' ? 'hidden' : 'flex'}}  items-center justify-center w-20 h-full border-x px-4 value-col-percent">
                             {{ $percentage }}

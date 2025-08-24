@@ -214,8 +214,8 @@ class ForecastsController extends Controller
                 'Month' => $months[$i] ?? '',
                 'Company' => $companies[$i] ?? '',
                 'Department' => $departments[$i] ?? '',
+                'Actual' => '',
                 'Target' => '',
-                'Value' => '',
             ]);
         }
 
@@ -231,7 +231,7 @@ class ForecastsController extends Controller
             public function headings(): array
             {
                 return [
-                    'Category', 'KPI', 'Year', 'Month', 'Company', 'Department', 'Target', 'Value',
+                    'Category', 'KPI', 'Year', 'Month', 'Company', 'Department', 'Actual', 'Target',
                 ];
             }
         }, 'forecasts-sample-'.date('YmdHis').'.xlsx');
@@ -260,10 +260,6 @@ class ForecastsController extends Controller
             }
 
             return back()->withErrors($flatErrors);
-        }
-
-        foreach ($import->validRows as $row) {
-            Forecast::create($row);
         }
 
         return back()->with('success', count($import->validRows).' forecasts imported successfully.');

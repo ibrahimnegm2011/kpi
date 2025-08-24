@@ -192,10 +192,10 @@
                         Status
                     </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-grey-dark border-b border-grey-light">
-                        Target
+                        Actual
                     </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-grey-dark border-b border-grey-light">
-                        Submitted Value
+                        Target
                     </th>
                     <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-grey-dark border-b border-grey-light"></th>
                 </tr>
@@ -213,8 +213,8 @@
                         <td class="py-4 px-6 border-b border-grey-light">{{\Carbon\Carbon::create()->month($forecast->month)->year($forecast->year)->format('F, Y')}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->company->name}} <br/> {{$forecast->department->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->is_closed ? 'Closed' : 'Opened'}}</td>
-                        <td class="py-4 px-6 border-b border-grey-light">{{$forecast->target}}</td>
                         <td class="py-4 px-6 border-b border-grey-light" title="{{$forecast->submitted_at}}">{{$forecast->is_submitted ? $forecast->value : '-'}}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">{{$forecast->target}}</td>
 
                         <td class="py-4 px-6 border-b border-grey-light ">
                             <a class="text-secondary-500 hover:text-primary-500" href="{{route('account.forecasts.view', $forecast->id)}}"> <i class="fas fa-eye"></i> </a>
@@ -241,7 +241,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="py-4 px-6 border-b border-grey-light">No forecasts found.</td>
+                        <td colspan="8" class="py-4 px-6 border-b border-grey-light">No forecasts found.</td>
                     </tr>
                 @endforelse
                 </tbody>
@@ -334,7 +334,7 @@
                 bulkForm.submit();
             }
 
-            // Initialize state on page load (in case of persisted pagination)
+            // Initialize state on page load
             updateBulkState();
         </script>
     </x-slot:scripts>
