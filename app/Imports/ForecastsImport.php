@@ -11,8 +11,10 @@ use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -25,10 +27,17 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
     public array $validRows = [];
 
+    public array $seen = [];
+
     public bool $tooManyRows = false;
 
     public function collection(Collection $collection): void
     {
+        $this->errors = [];
+        $this->validRows = [];
+        $this->seen = [];
+        $this->tooManyRows = false;
+
         $dataRows = $collection->skip(1); // skip header
 
         if ($dataRows->count() > 2000) {
@@ -36,8 +45,6 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
             return;
         }
-
-        $seen = [];
 
         foreach ($dataRows as $line => $row) {
 
@@ -57,8 +64,16 @@ use Maatwebsite\Excel\Concerns\ToCollection;
             return;
         }
 
-        collect($this->validRows)->chunk(100)->each(function ($chunk) {
-            Forecast::insert($chunk->toArray());
+        DB::transaction(function(){
+            collect($this->validRows)->chunk(100)->each(function ($chunk) {
+                $rows = $chunk->map(function ($row) {
+                    $row = is_array($row) ? $row : $row->toArray();
+                    $row['id'] = (string) Str::ulid();
+                    return $row;
+                })->toArray();
+
+                Forecast::insert($rows);
+            });
         });
     }
 
@@ -73,6 +88,9 @@ use Maatwebsite\Excel\Concerns\ToCollection;
             'department' => trim($row[5] ?? ''),
             'value' => $row[6] ?? null,
             'target' => $row[7] ?? null,
+            'is_submitted' => false,
+            'submitted_at' => null,
+            'submitted_by' => null,
         ];
 
         // normalize date
@@ -131,12 +149,12 @@ use Maatwebsite\Excel\Concerns\ToCollection;
         }
 
         $key = strtolower("{$data['kpi_id']}-{$data['company_id']}-{$data['department_id']}-{$data['month']}-{$data['year']}");
-        if (isset($seen[$key])) {
+        if (isset($this->seen[$key])) {
             $this->errors[$line][] = 'Duplicate forecast in the file.';
 
             return false;
         }
-        $seen[$key] = true;
+        $this->seen[$key] = true;
 
         if (Forecast::where([
             'kpi_id' => $data['kpi_id'],

@@ -71,11 +71,12 @@ class DashboardController extends Controller
             ->orderBy('month')
             ->get();
 
+        $percent = $data->sum('target') == 0 ? 0 : round(($data->sum('value') / $data->sum('target'))  * 100,2);
         return response()->json([
             'name' => $data[0]->kpi->name,
             'value' => $data->sum('value'),
             'goal' => $data->sum('target'),
-            'percent' => round(($data->sum('value') / $data->sum('target'))  * 100,2),
+            'percent' => $percent,
             'months' => $data->pluck('month'),
             'targets' => $data->pluck('target'),
             'values' => $data->pluck('value'),
