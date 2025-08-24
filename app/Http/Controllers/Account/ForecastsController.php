@@ -152,6 +152,7 @@ class ForecastsController extends Controller
             'action' => ['required', Rule::in(['close', 'open'])],
             'ids' => ['required', 'array'],
             'ids.*' => ['required', Rule::exists('forecasts', 'id')->where('account_id', Auth::user()->account_id)],
+            'redirect' => ['nullable', 'url'],
         ]);
 
         $forecastsQ = Forecast::whereIn('id', $data['ids'])
@@ -166,7 +167,8 @@ class ForecastsController extends Controller
 
         $forecastsQ->update(['is_closed' => $data['action'] == 'close']);
 
-        return redirect(route('account.forecasts.index'))->with(['success' => "{$count} forecasts have been {$data['action']}ed successfully."]);
+        $redirectTo = $request->input('redirect', route('account.forecasts.index'));
+        return redirect($redirectTo)->with(['success' => "{$count} forecasts have been {$data['action']}ed successfully."]);
     }
 
     public function delete(Forecast $forecast)
