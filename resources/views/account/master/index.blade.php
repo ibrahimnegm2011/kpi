@@ -78,8 +78,8 @@
                         <th class="pt-4 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b  border-x border-grey-light whitespace-nowrap text-center">
                             <span> {{ \Carbon\Carbon::create()->month($monthNo)->format('F') }} </span>
                             <div class="w-full flex justify-center items-center gap-0 mt-1 h-full">
+                                <div class="flex items-center justify-center w-20 h-12 border-x border-t px-4">Actual</div>
                                 <div class="flex items-center justify-center w-20 h-12 border-x border-t px-4">Target</div>
-                                <div class="flex items-center justify-center w-20 h-12 border-x border-t px-4">Value</div>
                                 <div class="{{request('filter.analysis', 'percent') != 'percent' ? 'hidden' : 'flex'}} items-center justify-center w-20 h-12 border-x border-t px-4 value-col-percent">%</div>
                                 <div class="{{request('filter.analysis', 'percent') != 'variance' ? 'hidden' : 'flex'}} items-center justify-center w-20 h-12 border-x border-t px-4 value-col-variance">V</div>
                             </div>

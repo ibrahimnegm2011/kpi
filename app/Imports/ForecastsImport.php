@@ -8,6 +8,7 @@ use App\Models\Department;
 use App\Models\Forecast;
 use App\Models\Kpi;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -30,7 +31,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
     {
         $dataRows = $collection->skip(1); // skip header
 
-        if ($dataRows->count() > 100) {
+        if ($dataRows->count() > 2000) {
             $this->tooManyRows = true;
 
             return;
@@ -40,95 +41,116 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
         foreach ($dataRows as $line => $row) {
 
-            $data = [
-                'category' => trim($row[0] ?? ''),
-                'kpi' => trim($row[1] ?? ''),
-                'year' => $row[2] ?? null,
-                'month' => trim($row[3] ?? ''),
-                'company' => trim($row[4] ?? ''),
-                'department' => trim($row[5] ?? ''),
-                'target' => $row[6] ?? null,
-                'value' => $row[7] ?? null,
-            ];
+            $data = $this->validateRow($line, $row);
 
-            // normalize date
-            $inputDate = $this->normalizeInputDate($data['month'], $data['year']);
-            if (is_string($inputDate)) {
-                $this->errors[$line][] = $inputDate;
-
-                continue;
-            }
-            $data = array_merge($data, $inputDate);
-
-            // check kpi exists
-            $kpi = $this->getKpisMap()[strtolower($data['category'])][strtolower($data['kpi'])] ?? null;
-            if (! $kpi) {
-                $this->errors[$line][] = "KPI '{$data['kpi']}' is invalid or not related to category '{$data['category']}'";
-
-                continue;
-            }
-            $data['kpi_id'] = $kpi->id;
-            unset($data['kpi'], $data['category']);
-
-            // check company exists
-            $data['company_id'] = $this->getCompaniesMap()[strtolower($data['company'])] ?? null;
-            if (! $data['company_id']) {
-                $this->errors[$line][] = "Invalid company: {$data['company']}";
-
-                continue;
-            }
-            unset($data['company']);
-
-            // check department exists
-            $data['department_id'] = $this->getDepartmentsMap()[strtolower($data['department'])] ?? null;
-            if (! $data['department_id']) {
-                $this->errors[$line][] = "Invalid department: {$data['department']}";
-
-                continue;
-            }
-            unset($data['department']);
-
-            if($data['value']){
-                $data['is_submitted'] = true;
-                $data['submitted_at'] = now();
-                $data['submitted_by'] = auth()->id();
-            }
-
-            $validator = Validator::make($data, [
-                'month' => 'required|integer|between:1,12',
-                'year' => 'required|integer|digits:4|min:'.date('Y'),
-                'target' => 'required',
-            ]);
-
-            if ($validator->fails()) {
-                $this->errors[$line] = $validator->errors()->all();
-
-                continue;
-            }
-
-            $key = strtolower("{$data['company_id']}-{$data['department_id']}-{$data['month']}-{$data['year']}");
-            if (isset($seen[$key])) {
-                $this->errors[$line][] = 'Duplicate forecast in the file.';
-
-                continue;
-            }
-            $seen[$key] = true;
-
-            if (Forecast::where([
-                'company_id' => $data['company_id'],
-                'department_id' => $data['department_id'],
-                'month' => $data['month'],
-                'year' => $data['year'],
-            ])->exists()) {
-                $this->errors[$line][] = 'Forecast already exists.';
-
-                continue;
-            }
+            if(!$data) continue;
 
             $data['account_id'] = Auth::user()->account_id;
             $data['created_by'] = Auth::user()->id;
+            $data['updated_at'] = now();
+            $data['created_at'] = now();
+
             $this->validRows[] = $data;
         }
+
+        if(! empty($this->errors)){
+            return;
+        }
+
+        collect($this->validRows)->chunk(100)->each(function ($chunk) {
+            Forecast::insert($chunk->toArray());
+        });
+    }
+
+    protected function validateRow($line, $row)
+    {
+        $data = [
+            'category' => trim($row[0] ?? ''),
+            'kpi' => trim($row[1] ?? ''),
+            'year' => $row[2] ?? null,
+            'month' => trim($row[3] ?? ''),
+            'company' => trim($row[4] ?? ''),
+            'department' => trim($row[5] ?? ''),
+            'value' => $row[6] ?? null,
+            'target' => $row[7] ?? null,
+        ];
+
+        // normalize date
+        $inputDate = $this->normalizeInputDate($data['month'], $data['year']);
+        if (is_string($inputDate)) {
+            $this->errors[$line][] = $inputDate;
+
+            return false;
+        }
+        $data = array_merge($data, $inputDate);
+
+        // check kpi exists
+        $kpi = $this->getKpisMap()[strtolower($data['category'])][strtolower($data['kpi'])] ?? null;
+        if (! $kpi) {
+            $this->errors[$line][] = "KPI '{$data['kpi']}' is invalid or not related to category '{$data['category']}'";
+
+            return false;
+        }
+        $data['kpi_id'] = $kpi->id;
+        unset($data['kpi'], $data['category']);
+
+        // check company exists
+        $data['company_id'] = $this->getCompaniesMap()[strtolower($data['company'])] ?? null;
+        if (! $data['company_id']) {
+            $this->errors[$line][] = "Invalid company: {$data['company']}";
+
+            return false;
+        }
+        unset($data['company']);
+
+        // check department exists
+        $data['department_id'] = $this->getDepartmentsMap()[strtolower($data['department'])] ?? null;
+        if (! $data['department_id']) {
+            $this->errors[$line][] = "Invalid department: {$data['department']}";
+
+            return false;
+        }
+        unset($data['department']);
+
+        if($data['value']){
+            $data['is_submitted'] = true;
+            $data['submitted_at'] = now();
+            $data['submitted_by'] = auth()->id();
+        }
+
+        $validator = Validator::make($data, [
+            'month' => 'required|integer|between:1,12',
+            'year' => 'required|integer|digits:4',
+            'target' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $this->errors[$line] = $validator->errors()->all();
+
+            return false;
+        }
+
+        $key = strtolower("{$data['kpi_id']}-{$data['company_id']}-{$data['department_id']}-{$data['month']}-{$data['year']}");
+        if (isset($seen[$key])) {
+            $this->errors[$line][] = 'Duplicate forecast in the file.';
+
+            return false;
+        }
+        $seen[$key] = true;
+
+        if (Forecast::where([
+            'kpi_id' => $data['kpi_id'],
+            'company_id' => $data['company_id'],
+            'department_id' => $data['department_id'],
+            'month' => $data['month'],
+            'year' => $data['year'],
+        ])->exists()) {
+            $this->errors[$line][] = 'Forecast already exists.';
+
+            return false;
+        }
+
+        return $data;
     }
 
     protected function normalizeInputDate($month, $year): array|string
