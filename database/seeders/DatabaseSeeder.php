@@ -35,6 +35,12 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        $this->addAccount1();
+        $this->addAccount2();
+    }
+
+    protected function addAccount1()
+    {
         $account = Account::factory()->create([
             'name' => 'IT Account',
             'contact_name' => 'Account 1',
@@ -150,6 +156,94 @@ class DatabaseSeeder extends Seeder
                     }
                 }
             }
+        }
+    }
+
+    protected function addAccount2()
+    {
+        $account = Account::factory()->create([
+            'name' => 'Operations Account',
+            'contact_name' => 'Account 2',
+            'contact_email' => 'account2@sirc.sa',
+            'contact_phone' => '+96657838778',
+        ]);
+
+        $accUser = User::factory()->create([
+            'account_id' => $account->id,
+            'name' => 'Account 2',
+            'email' => 'account2@sirc.sa',
+            'type' => UserType::ACCOUNT(),
+        ]);
+        $account->update(['admin_user_id' => $accUser->id]);
+
+        foreach (Permission::accountPermissions() as $permission) {
+            UserPermission::factory()->create([
+                'user_id' => $accUser->id,
+                'permission' => $permission,
+            ]);
+        }
+
+        Company::factory()->create(['name' => 'AKAM', 'account_id' => $account->id]);
+        Company::factory()->create(['name' => 'EADA', 'account_id' => $account->id]);
+        Company::factory()->create(['name' => 'MASAB', 'account_id' => $account->id]);
+        Company::factory()->create(['name' => 'REVIVA', 'account_id' => $account->id]);
+        Company::factory()->create(['name' => 'SAIL', 'account_id' => $account->id]);
+        Company::factory()->create(['name' => 'SIRC', 'account_id' => $account->id]);
+        Company::factory()->create(['name' => 'Sustainability Solutions', 'account_id' => $account->id]);
+        Company::factory()->create(['name' => 'Tajmee', 'account_id' => $account->id]);
+
+        Department::factory()->create(['name' => 'CB', 'account_id' => $account->id]);
+        Department::factory()->create(['name' => 'Operation', 'account_id' => $account->id]);
+        Department::factory()->create(['name' => 'Finance', 'account_id' => $account->id]);
+
+        $catCB = Category::factory()->create(['name' => 'CB', 'account_id' => $account->id]);
+        $catFI = Category::factory()->create(['name' => 'Finance', 'account_id' => $account->id]);
+        $catOP = Category::factory()->create(['name' => 'Operation', 'account_id' => $account->id]);
+
+        $cbKPI = [
+            'Cybersecurity  Effectiveness',
+            'Employee Engagement Surveys',
+            'ERP implementation',
+            'Local Content',
+            'Number of Employees',
+            'Number of Saudis Full Time Employee',
+            'Saudization Rate',
+        ];
+        $finKPIs = [
+            'EBIT (Operating Profit)',
+            'EBITDA',
+            'Revenue',
+            'Working Capital Ratio',
+        ];
+        $opKPIs = [
+            'KSA Landfill Diverted Amount',
+            'KSA Landfill Diverted Rate',
+            'Lost-time injuries (LTI)',
+            'Near Miss Incident (NMI)',
+            'Nnmber of fatalities',
+            'Recycled Amount',
+            'Recycling Rate',
+            'Total amount Waste Diverted from Landfill',
+            'Total Collected Waste',
+            'Total rate Waste Diverted from Landfill',
+        ];
+
+        foreach ($cbKPI as $kpi) {
+            Kpi::factory()->create([
+                'account_id' => $account->id, 'category_id' => $catCB->id, 'name' => $kpi, 'definition' => $kpi,
+            ]);
+        }
+
+        foreach ($finKPIs as $kpi) {
+            Kpi::factory()->create([
+                'account_id' => $account->id, 'category_id' => $catFI->id, 'name' => $kpi, 'definition' => $kpi,
+            ]);
+        }
+
+        foreach ($opKPIs as $kpi) {
+            Kpi::factory()->create([
+                'account_id' => $account->id, 'category_id' => $catOP->id, 'name' => $kpi, 'definition' => $kpi,
+            ]);
         }
     }
 }
