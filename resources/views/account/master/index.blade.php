@@ -21,7 +21,7 @@
                         @endphp
                         @if(isset($minYear) && isset($maxYear))
                             @for($year = $minYear; $year <= $maxYear; $year++)
-                                <option value="{{ $year }}" {{ request('filter.year') ?? now()->year == $year ? 'selected' : '' }}>
+                                <option value="{{ $year }}" {{ request('filter.year',  now()->year) == $year ? 'selected' : '' }}>
                                     {{ $year }}
                                 </option>
                             @endfor

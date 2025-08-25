@@ -52,7 +52,7 @@
                     <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Month</div>
                     <div class="bg-gray-100 text-sm p-3 rounded-b">
                         @php
-                            $preselected = array_map('intval', request('filter.months', []));
+                            $preselected = array_map('intval', json_decode(request('filter.months', '[]')));
                             $monthNames = [];
                             foreach (range(1, 12) as $m) {
                                 $monthNames[$m] = \Carbon\Carbon::create()->month($m)->format('F');
@@ -107,10 +107,12 @@
                                 </div>
                             </div>
 
-                            <!-- Hidden inputs (only enabled for selected months) -->
-                            @for($i = 1; $i <= 12; $i++)
-                                <input type="hidden" name="filter[months][]" value="{{ $i }}" :disabled="selected.indexOf({{ $i }}) === -1">
-                            @endfor
+{{--                            <!-- Hidden inputs (only enabled for selected months) -->--}}
+{{--                            @for($i = 1; $i <= 12; $i++)--}}
+{{--                                <input type="hidden" name="filter[months][]" value="{{ $i }}" :disabled="selected.indexOf({{ $i }}) === -1">--}}
+{{--                            @endfor--}}
+
+                            <input type="hidden" name="filter[months]" x-ref="monthsField" :value="JSON.stringify(selected)">
                         </div>
                     </div>
                 </div>
@@ -126,7 +128,7 @@
                         'company' => request('filter.company'),
                         'department' => request('filter.department'),
                         'year' => request('filter.year', now()->year),
-                        'months' => array_map('intval', request('filter.months', [])),
+                        'months' => $preselected,
                     ];
                 @endphp
                 <div class="bg-white rounded shadow p-4 relative kpi-card" data-initial-kpi-id="{{ $defaultKpiId }}">
@@ -403,14 +405,10 @@
                                 kpi_id: String(selectedKpiId || ''),
                                 company: filters.company || '',
                                 department: filters.department || '',
-                                year: String(filters.year || '')
+                                year: String(filters.year || ''),
+                                months: JSON.stringify(filters.months)
                             };
                             var qs = $.param(params, true);
-                            var months = Array.isArray(filters.months) ? filters.months : [];
-                            console.log(filters, months);
-                            months.forEach(function (m) {
-                                qs += '&' + encodeURIComponent('months[]') + '=' + encodeURIComponent(Number(m));
-                            });
                             return endpoint + '?' + qs;
                         }
 

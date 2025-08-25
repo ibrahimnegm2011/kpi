@@ -6,8 +6,8 @@
         @foreach($months as $monthNo)
             @php
                 $forecast = $monthsForecasts->where('month', $monthNo)->first();
-                $target = floatval($forecast?->target);
-                $value = $forecast?->value ? floatval($forecast?->value) : '-';
+                $target = round($forecast?->target, 2);
+                $value = $forecast?->value ? round($forecast?->value, 2) : '-';
                 $percentage = ($forecast?->value && $target != 0)
                     ? round($value / $target * 100, 1) . '%'
                     : '-';

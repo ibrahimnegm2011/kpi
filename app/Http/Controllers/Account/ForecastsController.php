@@ -78,11 +78,6 @@ class ForecastsController extends Controller
             'reminder_option' => ['nullable', Rule::enum(ReminderOption::class)],
         ]);
 
-//        $date = Carbon::create()->month((int) $data['month'])->year((int) $data['year'])->day(1);
-//        if ($date->isPast()) {
-//            throw ValidationException::withMessages(['month' => 'Month must be in the future.']);
-//        }
-
         $q = Forecast::where('kpi_id', $data['kpi_id'])
             ->where('company_id', $data['company_id'])
             ->where('department_id', $data['department_id'])
@@ -120,11 +115,6 @@ class ForecastsController extends Controller
             'is_closed' => ['sometimes', 'boolean'],
         ]);
 
-//        $date = Carbon::create()->month((int) $data['month'])->year((int) $data['year'])->day(1);
-//        if ($date->isPast()) {
-//            throw ValidationException::withMessages(['month' => 'Month must be in the future.']);
-//        }
-
         $q = Forecast::whereNot('id', $forecast->id)
             ->where('kpi_id', $data['kpi_id'])
             ->where('company_id', $data['company_id'])
@@ -150,10 +140,20 @@ class ForecastsController extends Controller
     {
         $data = $request->validate([
             'action' => ['required', Rule::in(['close', 'open'])],
-            'ids' => ['required', 'array'],
-            'ids.*' => ['required', Rule::exists('forecasts', 'id')->where('account_id', Auth::user()->account_id)],
+            'ids' => ['required', 'json'],
             'redirect' => ['nullable', 'url'],
         ]);
+        $data['ids'] = json_decode($data['ids'], true);
+
+        //check all select forecasts ids are valid
+        if(
+            !is_array($data['ids']) ||
+            Forecast::whereIn('id', $data['ids'])
+                ->where('account_id', Auth::user()->account_id)
+                ->count() != count($data['ids'])
+        ){
+            throw ValidationException::withMessages(['ids' => 'Invalid forecasts selected.']);
+        }
 
         $forecastsQ = Forecast::whereIn('id', $data['ids'])
             ->when($data['action'] == 'close', fn ($q) => $q->where('is_closed', false))
