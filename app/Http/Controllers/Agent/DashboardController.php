@@ -17,7 +17,7 @@ class DashboardController extends AgentController
         if($request->has('filter')) {
             $inputs = $request->validate([
                 'filter.year' => ['nullable', 'integer', 'date_format:Y'],
-                'filter.months.*' => ['nullable', 'integer', 'min:1', 'max:12'],
+                'filter.months' => ['json'],
                 'filter.department' => [
                     'required',
                     Rule::exists('agent_assignments', 'department_id')->where('account_id', session('selected_account'))
@@ -27,12 +27,13 @@ class DashboardController extends AgentController
                     Rule::exists('agent_assignments', 'company_id')->where('account_id', session('selected_account'))
                 ],
             ]);
+            $inputs['filter']['months'] = json_decode($inputs['filter']['months']) ?? [];
 
             $data = Kpi::query()
                 ->where('is_active', true)
                 ->whereHas('forecasts', fn ($query) => $query
                     ->when($inputs['filter']['year'] ?? null, fn ($query, $year) => $query->where('year', $year))
-                    ->when($inputs['filter']['months'] ?? null, fn ($query, $months) => $query->whereIn('month', $months))
+                    ->when($inputs['filter']['months'], fn ($query, $months) => $query->whereIn('month', $months))
                     ->when($inputs['filter']['department'] ?? null, fn ($query, $departmentId) => $query->where('department_id', $departmentId))
                     ->when($inputs['filter']['company'] ?? null, fn ($query, $companyId) => $query->where('company_id', $companyId))
                     ->forCurrentAgentAssignments()
@@ -52,11 +53,12 @@ class DashboardController extends AgentController
     {
         $inputs = $request->validate([
             'year' => ['required', 'integer', 'date_format:Y'],
-            'months.*' => ['nullable', 'integer', 'min:1', 'max:12'],
+            'months' => ['json'],
             'department' => ['required', Rule::exists('agent_assignments', 'department_id')->where('account_id', session('selected_account'))],
             'company' => ['required', Rule::exists('agent_assignments', 'company_id')->where('account_id', session('selected_account'))],
             'kpi_id' => ['required', Rule::exists('kpis', 'id')->where('account_id', session('selected_account'))],
         ]);
+        $inputs['months'] = json_decode($inputs['months']) ?? [];
 
         $data = Forecast::query()
             ->forCurrentAgentAssignments()
@@ -65,7 +67,7 @@ class DashboardController extends AgentController
             ->where('department_id', $inputs['department'])
             ->where('company_id', $inputs['company'])
             ->where('kpi_id', $inputs['kpi_id'])
-            ->when($inputs['months'] ?? null, fn ($query, $months) => $query->whereIn('month', $months))
+            ->when($inputs['months'], fn ($query, $months) => $query->whereIn('month', $months))
             ->with('kpi')
             ->orderBy('month')
             ->get();

@@ -49,18 +49,27 @@
 
                 <div id="permissions-div" class="w-full my-5">
                     <label class="w-full py-4 ms-2 font-bold text-gray-900 dark:text-gray-300">Permissions: </label>
+                    <input type="hidden" name="permissions" id="permissions-json" value="[]">
                     <div class="border rounded-md px-4 grid grid-cols-4 justify-start items-start content-start align-middle justify-items-start">
-                    @foreach(\App\Enums\Permission::adminPermissions() as $i => $case)
-                        <div class="w-full md:w-1/2  pt-3">
-                            <div class="flex items-center dark:border-gray-700">
-                                <input id="permission-check-{{$i}}" type="checkbox" value="{{$case->value}}" name="permissions[]"
-                                       {{in_array($case->value, old('permissions', $user?->permissions->pluck('permission')->toArray() ?? [])) ? 'checked' : '' }}
-                                       class="w-7 h-7 text-emerald-400 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                <label for="permission-check-{{$i}}"
-                                       class="w-full py-4 ms-2 font-bold text-gray-900 dark:text-gray-300">{{$case->title()}}</label>
+                        @php
+                            $oldPermissions = json_decode(
+                                old(
+                                    'permissions',
+                                    json_encode($user?->permissions->pluck('permission')->toArray() ?? [])
+                                )
+                            );
+                        @endphp
+                        @foreach(\App\Enums\Permission::adminPermissions() as $i => $case)
+                            <div class="w-full md:w-1/2  pt-3">
+                                <div class="flex items-center dark:border-gray-700">
+                                    <input id="permission-check-{{$i}}" type="checkbox" value="{{$case->value}}"
+                                           {{in_array($case->value, $oldPermissions) ? 'checked' : '' }}
+                                           class="w-7 h-7 text-emerald-400 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <label for="permission-check-{{$i}}"
+                                           class="w-full py-4 ms-2 font-bold text-gray-900 dark:text-gray-300">{{$case->title()}}</label>
+                                </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
                     </div>
                 </div>
 
@@ -85,5 +94,40 @@
             </div>
         </form>
     </div>
-    
+
+    <x-slot:scripts>
+        <script>
+            (function () {
+                const container = document.getElementById('permissions-div');
+                const hidden = document.getElementById('permissions-json');
+
+                function readChecked() {
+                    const boxes = container.querySelectorAll('.permission-checkbox');
+                    return Array.from(boxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.value);
+                }
+
+                function writeHidden() {
+                    if (!hidden) return;
+                    hidden.value = JSON.stringify(readChecked());
+                }
+
+                writeHidden();
+
+                container.addEventListener('change', function (e) {
+                    if (e.target && e.target.classList.contains('permission-checkbox')) {
+                        writeHidden();
+                    }
+                });
+
+                // Ensure latest value before submit (in case of programmatic changes)
+                const form = container.closest('form');
+                if (form) {
+                    form.addEventListener('submit', writeHidden);
+                }
+            })();
+        </script>
+
+    </x-slot:scripts>
 </x-app-layout>

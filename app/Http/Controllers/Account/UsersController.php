@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -51,7 +52,7 @@ class UsersController extends Controller
             'email' => ['required', 'email', Rule::unique('users', 'email')],
             'password' => Password::required(),
             'is_active' => ['sometimes', 'boolean'],
-            'permissions' => ['nullable', 'array', 'min:1'],
+            'permissions' => ['nullable', 'json'],
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
@@ -60,11 +61,14 @@ class UsersController extends Controller
         $data['type'] = UserType::ACCOUNT();
         $data['created_by'] = Auth::id();
 
-        $user = User::create(Arr::except($data, ['permissions']));
+        DB::transaction(function () use ($data) {
+            $user = User::create(Arr::except($data, ['permissions']));
 
-        if ($data['permissions'] ?? false) {
-            $user->addPermissions($data['permissions']);
-        }
+            $data['permissions'] = json_decode($data['permissions']) ?? [];
+            if ($data['permissions']) {
+                $user->addPermissions($data['permissions']);
+            }
+        });
 
         return redirect(route('account.users.index'))->with(['success' => 'User has been created successfully']);
     }
@@ -80,16 +84,19 @@ class UsersController extends Controller
             'name' => ['required', 'string'],
             'password' => ['nullable', ...Password::sometimes()],
             'is_active' => ['sometimes', 'boolean'],
-            'permissions' => ['sometimes', 'array'],
+            'permissions' => ['sometimes', 'json'],
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
 
-        $user->update(Arr::except($data, ['permissions']));
+        DB::transaction(function () use ($user, $data) {
+            $user->update(Arr::except($data, ['permissions']));
 
-        $data['permissions'] = $data['permissions'] ?? [];
-
-        $user->addPermissions($data['permissions']);
+            $data['permissions'] = json_decode($data['permissions']) ?? [];
+            if ($data['permissions']) {
+                $user->addPermissions($data['permissions']);
+            }
+        });
 
         return redirect(route('account.users.index'))->with(['success' => 'User has been updated successfully']);
     }

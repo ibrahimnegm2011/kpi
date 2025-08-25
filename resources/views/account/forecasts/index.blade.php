@@ -154,6 +154,7 @@
                 @csrf
                 <input type="hidden" name="redirect" value="{{ url()->full() }}">
                 <input type="hidden" name="action" id="bulk-action" value="">
+                <input type="hidden" name="ids" id="bulk-ids">
                 <span id="selected-count" class="text-sm text-gray-600"></span>
 
                 <button type="button"
@@ -283,17 +284,10 @@
                 const checkboxes = document.querySelectorAll('.row-checkbox');
                 const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
 
-                // Clear existing hidden inputs
-                Array.from(bulkForm.querySelectorAll('input[name="ids[]"]')).forEach(el => el.remove());
-
-                // Append selected as hidden inputs
-                selected.forEach(id => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'ids[]';
-                    input.value = id;
-                    bulkForm.appendChild(input);
-                });
+                const idsField = document.getElementById('bulk-ids');
+                if (idsField) {
+                    idsField.value = JSON.stringify(selected);
+                }
 
                 // Update Select All state
                 if (checkboxes.length > 0) {
@@ -327,8 +321,11 @@
             function submitBulk(action) {
                 const existing = bulkForm.querySelector('#bulk-action');
                 existing.value = action; // 'close' or 'open'
-                const hasIds = bulkForm.querySelector('input[name="ids[]"]') !== null;
-                if (!hasIds) {
+                const idsField = document.getElementById('bulk-ids');
+                const selected = (() => {
+                    try { return JSON.parse(idsField?.value || '[]'); } catch { return []; }
+                })();
+                if (!Array.isArray(selected) || selected.length === 0) {
                     alert('Please select at least one forecast.');
                     return;
                 }

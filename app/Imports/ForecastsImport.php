@@ -86,7 +86,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
             'month' => trim($row[3] ?? ''),
             'company' => trim($row[4] ?? ''),
             'department' => trim($row[5] ?? ''),
-            'value' => $row[6] ?? null,
+            'value' => $row[6],
             'target' => $row[7] ?? null,
             'is_submitted' => false,
             'submitted_at' => null,
@@ -130,7 +130,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
         }
         unset($data['department']);
 
-        if($data['value']){
+        if(! is_null($data['value'])){
             $data['is_submitted'] = true;
             $data['submitted_at'] = now();
             $data['submitted_by'] = auth()->id();
