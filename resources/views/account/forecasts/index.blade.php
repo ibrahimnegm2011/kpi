@@ -214,7 +214,10 @@
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->kpi->name}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{\Carbon\Carbon::create()->month($forecast->month)->year($forecast->year)->format('F, Y')}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->company->name}} <br/> {{$forecast->department->name}}</td>
-                        <td class="py-4 px-6 border-b border-grey-light">{{$forecast->is_closed ? 'Closed' : 'Opened'}}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">
+                            {{$forecast->is_closed ? 'Closed' : 'Opened'}}<br/>
+                            {{$forecast->is_submitted ? 'Submitted' : 'Not Submitted'}}
+                        </td>
                         <td class="py-4 px-6 border-b border-grey-light" title="{{$forecast->submitted_at}}">{{$forecast->is_submitted ? $forecast->value : '-'}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->target}}</td>
 
