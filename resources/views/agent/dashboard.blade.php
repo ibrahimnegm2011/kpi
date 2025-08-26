@@ -1,13 +1,16 @@
 <x-app-layout>
+    <div class="flex justify-between ml-4 mb-2">
+        <h1 class="text-3xl text-black font-semibold"><i class="fas fa-chart-column mr-3"></i> Dashboard </h1>
+    </div>
     <div class="flex flex-col lg:flex-row p-4 space-y-4 lg:space-y-0 lg:space-x-6">
         {{-- Left Sidebar Filters --}}
         <div class="w-full lg:w-1/4 space-y-4">
 
             {{-- Filter Card Style --}}
-            <form class="bg-white p-4 rounded shadow space-y-10" id="search-form">
+            <form class="p-4 rounded space-y-10" id="search-form">
                 <div>
                     <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Company</div>
-                    <div class="bg-gray-100 text-sm p-3 rounded-b">
+                    <div class="bg-primary-50 text-sm p-3 rounded-b">
                         <select class="w-full border border-primary-700" name="filter[company]">
                             <option value="" disabled {{!request('filter.company') ? 'selected': ''}}>Select Company</option>
                             @foreach($companies as $id => $name)
@@ -19,7 +22,7 @@
 
                 <div>
                     <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Department</div>
-                    <div class="bg-gray-100 text-sm p-3 rounded-b">
+                    <div class="bg-primary-50 text-sm p-3 rounded-b">
                         <select class="w-full border border-primary-700" name="filter[department]">
                             <option value="" disabled {{!request('filter.department') ? 'selected': ''}}>Select Department</option>
                             @foreach($departments as $id => $name)
@@ -31,7 +34,7 @@
 
                 <div>
                     <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Year</div>
-                    <div class="bg-gray-100 text-sm p-3 rounded-b">
+                    <div class="bg-primary-50 text-sm p-3 rounded-b">
                         <select class="w-full border border-primary-700" name="filter[year]">
                             @php
                                 $minYear = \App\Models\Forecast::min('year') ?? date('Y');
@@ -50,7 +53,7 @@
 
                 <div>
                     <div class="bg-primary-500 text-white text-center font-bold px-3 py-1 rounded-t-md">Month</div>
-                    <div class="bg-gray-100 text-sm p-3 rounded-b">
+                    <div class="bg-primary-50 text-sm p-3 rounded-b">
                         @php
                             $preselected = array_map('intval', json_decode(request('filter.months', '[]')));
                             $monthNames = [];
@@ -131,7 +134,7 @@
                         'months' => $preselected,
                     ];
                 @endphp
-                <div class="bg-white rounded shadow p-4 relative kpi-card" data-initial-kpi-id="{{ $defaultKpiId }}">
+                <div class="bg-gradient-to-b from-transparent to-primary-50 rounded shadow p-4 relative kpi-card" data-initial-kpi-id="{{ $defaultKpiId }}">
                     <h2 class="text-lg font-semibold ml-2 pt-1">{{ $category }}</h2>
 
                     <div class="absolute top-4 right-4">
@@ -153,7 +156,12 @@
 
                                 <div class="flex items-center justify-center text-4xl font-bold mx-4 kpi-value-wrap">
                                     <span class="kpi-value">—</span>
-                                    <span class="ml-2 text-xl kpi-alert" style="display:none;">!</span>
+                                    <span class="ml-5 mt-1 text-sm kpi-alert" style="display:none;">
+                                        <span class="fa-stack fa-1x" aria-label="Important">
+                                            <i class="fa-regular fa-circle fa-stack-2x"></i>   <!-- outline ring -->
+                                            <i class="fa-solid fa-exclamation fa-stack-1x"></i> <!-- exclamation -->
+                                        </span>
+                                    </span>
                                 </div>
                                 <div class="text-sm text-gray-600 mx-4">
                                     Goal: <span class="kpi-goal">—</span>
@@ -364,19 +372,19 @@
                                         labels: L,
                                         datasets: [
                                             {
-                                                label: 'Target',
-                                                data: T,
-                                                backgroundColor: 'rgba(59, 130, 246, 0.45)',
-                                                borderColor: 'rgba(59, 130, 246, 1)',
+                                                label: 'Actual',
+                                                data: V,
+                                                backgroundColor: '#5CA082',
+                                                borderColor: '#5CA082',
                                                 borderWidth: 1
                                             },
                                             {
-                                                label: 'Value',
-                                                data: V,
-                                                backgroundColor: 'rgba(124, 58, 237, 0.45)',
-                                                borderColor: 'rgba(124, 58, 237, 1)',
+                                                label: 'Target',
+                                                data: T,
+                                                backgroundColor: '#62C2E1',
+                                                borderColor: '#62C2E1',
                                                 borderWidth: 1
-                                            }
+                                            },
                                         ]
                                     },
                                     options: {
