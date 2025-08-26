@@ -19,6 +19,6 @@ class AccountChangeController extends Controller
 
         session(['selected_account' => $request->accountId]);
 
-        return back()->with(['success' => 'Account changed']);
+        return redirect()->route('agent.home');
     }
 }
