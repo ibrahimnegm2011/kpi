@@ -44,8 +44,12 @@ class DashboardController extends AgentController
         }
 
 
-        $companies = Auth::user()->agent_assignments->pluck('company.name', 'company_id')->toArray();
-        $departments = Auth::user()->agent_assignments->pluck('department.name', 'department_id')->toArray();
+        $companies = Auth::user()->agent_assignments
+            ->where('account_id', session('selected_account'))
+            ->pluck('company.name', 'company_id')->toArray();
+        $departments = Auth::user()->agent_assignments
+            ->where('account_id', session('selected_account'))
+            ->pluck('department.name', 'department_id')->toArray();
         return view('agent.dashboard', compact('data', 'companies', 'departments'));
     }
 

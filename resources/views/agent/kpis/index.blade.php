@@ -85,6 +85,14 @@
                             @if($forecast->isSubmittable())
                                 <a class="bg-primary-500 hover:bg-secondary-700 text-white font-bold py-2 px-4 rounded"
                                    href="{{route('agent.kpi_submit_form', $forecast)}}">Submit</a>
+                            @elseif($forecast->is_closed)
+                                <span class="bg-gray-400 text-white font-bold py-2 px-4 rounded disabled cursor-not-allowed">
+                                    Closed
+                                </span>
+                            @else
+                                <span class="bg-gray-400 text-white font-bold py-2 px-4 rounded disabled cursor-not-allowed">
+                                    Upcoming
+                                </span>
                             @endif
                         </td>
                     </tr>

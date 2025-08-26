@@ -87,18 +87,15 @@
                         <td class="py-4 px-6 border-b border-grey-light">{{$forecast->target}}</td>
                         <td class="py-4 px-6 border-b border-grey-light" title="{{$forecast->submitted_at}}">{{$forecast->value}}</td>
                         <td class="py-4 px-6 border-b border-grey-light">
-                            @if($forecast->evidence_filepath)
-                                <a class="mx-1 text-secondary-500 hover:text-primary-500"
-                                   title="Download Evidence"
-                                   href="{{route('agent.forecasts.download', $forecast)}}" target="_blank">
-                                    <i class="fas fa-file-download"></i>
-                                </a>
-                            @endif
 
                             @if(! $forecast->is_closed)
-                                <a class="mx-1 text-secondary-500 hover:text-primary-500" href="{{route('agent.kpi_submit_form', $forecast)}}">
-                                    <i class="fas fa-edit"></i>
+                                <a class="mx-1 bg-secondary-500 hover:bg-secondary-700 text-white font-bold py-2 px-4 rounded" href="{{route('agent.kpi_submit_form', $forecast)}}">
+                                    Edit
                                 </a>
+                            @else
+                                <span class="mx-1 bg-gray-400 text-white font-bold py-2 px-4 rounded disabled">
+                                    Closed
+                                </span>
                             @endif
                         </td>
                     </tr>
